@@ -1,0 +1,18 @@
+if(!exists("meta") || is.null(meta)) meta <- packageDescription("RiskPortfolios")
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
+vers <- paste("version", meta$Version)
+
+citHeader("To cite 'RiskPortfolios' in publications use:")
+
+citEntry(entry = "manual",
+	 title = "{RiskPortfolios}: Computation of risk-based portfolios in R",
+	 author = personList(person("David","Ardia"),
+                             person("Kris","Boudt"),
+                             person("Jean-Philippe","Gagnon-Fleury")),
+     year = year,
+	 note = vers,
+	 url = "https://r-forge.r-project.org/projects/riskportfolios/",
+	 textVersion =
+         paste("David Ardia, Kris Boudt and Jean-Philippe Gagnon-Fleury (", year,"). ",
+               "'RiskPortfolios': Computation of risk-based portfolios in 'R'. ", vers, ".", sep = "")
+)

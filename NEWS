@@ -1,0 +1,30 @@
+Changes in Version 2.00.04 (DA)
+  o serveral error fixes
+  o new Imports instead of Depends
+
+Changes in Version 2.00.03 (DA)
+  o erc initialized at 1/sigma normlized
+
+Changes in Version 2.00.02 (DA)
+  o w0 starting value can now be passed in controls
+  o References updated
+
+Changes in Version 2.00.01 (DA)
+  o Renaming of the package with emphasis of risk-based portfolios
+  o Added inverse volatility portfolio
+
+Changes in Version 1.02.02 (DA)
+  o DESCRIPTION file adapted to new standard
+
+Changes in Version 1.02.01 (DA)
+  o Major revision of the package
+
+Changes in Version 1.01.02 (DA)
+  o bug fixd thanks to Samo Pahor
+
+Changes in Version 1.01.01 (DA)
+  o package's name
+  o package's version
+
+Changes in Version 1-00.01 (DA)
+  o first release

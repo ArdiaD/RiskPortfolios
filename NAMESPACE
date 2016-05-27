@@ -1,0 +1,5 @@
+export(impliedReturns)
+export(meanEstimation)
+export(covEstimation)
+export(semidevEstimation)
+export(optimalPortfolio)
