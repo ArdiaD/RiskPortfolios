@@ -42,7 +42,7 @@ A \eqn{(N \times 1)}{(N x 1)} vector of expected returns.
   \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3), pp.279--292.
 }
 \author{
-David Ardia <david.ardia@unifr.ch> and Jean-Philippe Gagnon Fleury.
+David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
 }
 \examples{
 # For the examples, we simply generate a 100 x 25 random matrix.

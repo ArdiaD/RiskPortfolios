@@ -104,9 +104,9 @@ We note the linear relationship between \eqn{\mu} and \eqn{\Sigma w}:
 A \eqn{(N \times 1)}{(N x 1)} vector of implied expected returns.
 }
 \references{
-  Ardia, D., Boudt, K. (2013). 
+  Ardia, D., Boudt, K. (2015). 
   Implied expected returns and the choice of a mean-variance efficient portfolio proxy.
-  \url{http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2215042}.
+  \emph{Journal of Portfolio Management} \bold{41} (4), pp.68--81.
 
   Best, M. J., Grauer, R. R., (1985). 
   Capital asset pricing compatible with observed market value weights. 
@@ -117,7 +117,7 @@ A \eqn{(N \times 1)}{(N x 1)} vector of implied expected returns.
   \emph{Financial Analyst Journal} \bold{48}(5), pp.28--43.
 }
 \author{
-David Ardia <david.ardia@unifr.ch> and Jean-Philippe Gagnon Fleury.
+David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
 }
 \examples{
 # For the examples, we simply generate a 100 x 25 random matrix.

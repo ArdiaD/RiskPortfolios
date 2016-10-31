@@ -74,6 +74,10 @@ A \eqn{(N \times 1)}{(N x 1)} vector of optimal portfolio weights.
   Ardia, D., Boudt, K. (2015). 
   Implied expected returns and the choice of a mean-variance efficient portfolio proxy.
   \emph{Journal of Portfolio Management} \bold{41} (4), pp.68--81.
+
+  Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).
+  The Impact of Covariance Misspecification in Risk-Based Portfolios.
+  \emph{Working paper}. URL \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
        
   Choueifaty, Y., Coignard, Y., (2008). 
   Toward maximum diversification. 
@@ -93,6 +97,7 @@ A \eqn{(N \times 1)}{(N x 1)} vector of optimal portfolio weights.
   
   Fan, J., Zhang, J., Yu, K., March (2009). 
   Asset allocation and risk assessment with gross exposure constraints for vast portfolios.
+  \emph{Working paper}.
   
   Maillard, S., Roncalli, T., Teiletche, J., (2010). 
   The properties of equally weighted risk contribution portfolios. 
@@ -103,7 +108,7 @@ A \eqn{(N \times 1)}{(N x 1)} vector of optimal portfolio weights.
   \emph{Journal of Portfolio Management} \bold{34}, Summer,pp.34--41.
 }
 \author{
-David Ardia <david.ardia@fsa.ulaval.ca> and Jean-Philippe Gagnon Fleury.
+David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
 }
 \examples{
 # For the examples, we simply generate a 100 x 25 random matrix.

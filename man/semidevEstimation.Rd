@@ -40,7 +40,7 @@ semidevEstimation(rets, control = list())
 A \eqn{(N \times 1)}{(N x 1)} vector of semideviations.
 }
 \author{
-David Ardia <david.ardia@unifr.ch> and Jean-Philippe Gagnon Fleury.
+David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
 }
 \examples{
 set.seed(3214)

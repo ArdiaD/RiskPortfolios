@@ -1,3 +1,6 @@
+Changes in Version 2.00.05 (DA)
+  o update informations and references
+
 Changes in Version 2.00.04 (DA)
   o serveral error fixes
   o new Imports instead of Depends
@@ -7,7 +10,7 @@ Changes in Version 2.00.03 (DA)
 
 Changes in Version 2.00.02 (DA)
   o w0 starting value can now be passed in controls
-  o References updated
+  o references updated
 
 Changes in Version 2.00.01 (DA)
   o Renaming of the package with emphasis of risk-based portfolios
@@ -17,7 +20,7 @@ Changes in Version 1.02.02 (DA)
   o DESCRIPTION file adapted to new standard
 
 Changes in Version 1.02.01 (DA)
-  o Major revision of the package
+  o major revision of the package
 
 Changes in Version 1.01.02 (DA)
   o bug fixd thanks to Samo Pahor

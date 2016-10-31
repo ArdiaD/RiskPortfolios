@@ -75,18 +75,18 @@ Part of the code is inspired from the Matlab code by Ledoit and Wolf.
   Out-of-sample Performance of Asset Allocation Strategies
   Ledoit, O., Wolf, M. (2002).
   Improved estimation of the covariance matrix of stock returns with an application to portfolio selection
-  \emph{Journal of Empirical Finance } \bold{10}, pp.603--621.
+  \emph{Journal of Empirical Finance} \bold{10}, pp.603--621.
   
   Ledoit, O., Wolf, M. (2003). 
   Honey, I Shrunk the Sample Covariance Matrix. 
-  \emph{The Journal of Portfolio Management} \bold{30}(4), pp.110--119.
+  \emph{Journal of Portfolio Management} \bold{30}(4), pp.110--119.
   
   Ledoit, O., Wolf, M. (2004). 
   A well-conditioned estimator for large-dimensional covariance matrices
   \emph{Journal of Multivariate Analysis} \bold{88}, pp.365--411.
 }
 \author{
-  David Ardia <david.ardia@unifr.ch> and Jean-Philippe Gagnon Fleury.
+  David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
 }
 \examples{
 # For the examples, we simply generate a 100 x 25 random matrix.
