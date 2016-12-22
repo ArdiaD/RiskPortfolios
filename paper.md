@@ -25,7 +25,8 @@ functionalities to build mean-variance, minimum variance, inverse-volatility wei
 equal-risk-contribution (@MaillardEtAl2010), maximum diversification (@Choueifaty2008), and
 risk-efficient (@AmencEtAl2011) portfolios. Optimization is achieved with the R packages `quadprog` (@quadprog) and `nloptr` (@nloptr).
 Long or gross constraints can be added to the optimizer. 
-As risk-based portfolios are mainly based on covariances, the package also provides a large set of covariance matrix estimators.
+As risk-based portfolios are mainly based on covariances, the package also provides a large set of covariance matrix estimators. A simulation study relying on the package is described in @ArdiaEtAl2016. The latest version of the package is 
+available at 'https://github.com/ArdiaD/RiskPortfolios}'.
 
 
 # References
