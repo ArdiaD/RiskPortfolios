@@ -1,16 +1,57 @@
+#' @name semidevEstimation
+#' @title Estimation of the semideviation
+#' @description Function which computes the semideviation.
+#' @details The argument \code{control} is a list that can supply any of the following
+#' components:
+#' 
+#' \itemize{
+#' \item \code{type} method used to compute the semideviation
+#' vector, among \code{"naive"} and \code{"ewma"} where:
+#' 
+#' \code{"naive"} is used to compute the simple semideviation.
+#' 
+#' \code{"ewma"} is used to compute the exponential weighted moving average
+#' semideviation. The data must be sorted from the oldest to the latest.
+#' 
+#' The semideviation for one stock is computed as follows. First we select the
+#' returns which are smaller than the average of the past returns; we get a new
+#' vector of dimension \eqn{K \times 1, K \le N}. Then, the weight \eqn{w_i}
+#' for each observation at its corresponding time \eqn{t} is computed as \eqn{w
+#' = \lambda^{t}}. We obtain a \eqn{K \times 1}{Kx1} vector. The vector of
+#' weights is then normalized.  Finally, the semideviation is obtained as the
+#' weighted standard deviation.
+#' 
+#' Default: \code{type = "naive"}.
+#' 
+#' \item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
+#' }
+#' 
+#' @param rets a \eqn{(T \times N)}{(T x N)} matrix of past returns.
+#' @param control control parameters (see *Details*).
+#' @return A \eqn{(N \times 1)}{(N x 1)} vector of semideviations.
+#' @author David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
+#' @keywords htest
+#' @examples
+#' set.seed(3214)
+#' T = 100
+#' N = 25
+#' rets = matrix(rnorm(T * N), nrow = T, ncol = N)
+#' 
+#' # Computes the naive semideviation estimation.
+#' semidevEstimation(rets)
+#' 
+#' # Computes the naive estimation of the semideviation.
+#' semidevEstimation(rets, control = list(type = "naive"))
+#' 
+#' # Computes the ewma estimation of the semideviation. Default lambda = 0.94.
+#' semidevEstimation(rets, control = list(type = "ewma"))
+#' 
+#' # Computes the ewma estimation of the semideviation. Lambda = 0.9.
+#' semidevEstimation(rets, control = list(type = "ewma", lambda = 0.9))
+#' @export
+
 semidevEstimation = function(rets, control = list()){
-  #########################################################################################  
-  # Compute the chosen semi-deviation
-  # INPUTs
-  #   rets     : matrix (T x N) returns
-  #   control  : a control list 
-  #   The argument control is a list that can supply any of the following components
-  #     type   : "naive", "ewma"
-  #     lambda : default = 0.94 
-  # OUTPUTs
-  #   semiDev  : vector (N x 1) semi-deviations
-  #########################################################################################   
-  
+
   if (missing(rets)){
     stop ('rets is missing')
   }

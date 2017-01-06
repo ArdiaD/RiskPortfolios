@@ -1,7 +1,94 @@
+#' @name impliedReturns
+#' @title Implied returns estimation
+#' @description Function which computes the implied returns.
+#' @details The argument \code{control} is a list that can supply any of the following
+#' components:
+#' \itemize{
+#' \item \code{type} method used to compute the implied returns,
+#' among \code{"regression"}, \code{"robust"}, \code{"constraint"} and \code{"rl"}
+#' where:
+#' 
+#' \code{"regression"} is use to compute the implied expected returns. The
+#' implied expected returns are solved by fitting the following regression:
+#' 
+#' \deqn{\tilde{\mu} = a + b[\hat{\Sigma}\hat{w}]}{\tilde{\mu} = a +
+#' b[\hat{\Sigma}\hat{w}]}
+#' 
+#' The option \code{"reg"} can be used with \code{"regression"} if you want a
+#' robust estimation or a constrained estimation. See \code{"reg"}.
+#' 
+#' \code{"bl"} is used to compute the Black-Litterman implied expected returns.
+#' The Black-Litterman implied expected return is estimated by fitting the
+#' following regression:
+#' 
+#' \deqn{\mu = l \iota + \gamma \Sigma w.}
+#' 
+#' \item{list("reg")}{is used when type = \code{'regression'}. \code{reg} can
+#' supply either \code{'robust'} or \code{'constraint'}.
+#' 
+#' \code{"robust"} is used to compute the robust estimation of the implied
+#' expected returns.
+#' 
+#' \code{"constraint"} is used to compute the implied expected returns with the
+#' restriction that the coefficient is larger than zero.
+#' 
+#' The constraint implied expected return estimate \eqn{\tilde{\mu}} is given
+#' by the following equation:
+#' 
+#' \deqn{\tilde{\mu} = a + b(\hat{\Sigma}\hat{w})}{\tilde{\mu} = a +
+#' b(\hat{\Sigma}\hat{w})}} 
+#' 
+#' \item \code{gamma} is used for the computation of the Black-Litterman implied 
+#' expected returns. Default: \code{gamma = 0.89}. 
+#' }
+#' 
+#' @param rets a \eqn{(T \times N)}{(T x N)} matrix of returns.
+#' @param mu a \eqn{(N \times 1)}{(N x 1)} vector of mean (expected returns).
+#' @param Sigma a \eqn{(N \times N)}{(N x N)} matrix of covariances.
+#' @param semiDev a \eqn{(N \times 1)}{(N x 1)} vector of semideviation.
+#' @param w a \eqn{(N \times 1)}{(N x 1)} vector of portfolio weights.
+#' @param control control parameters (see *Details*).
+#' @return A \eqn{(N \times 1)}{(N x 1)} vector of implied expected returns.
+#' @author David Ardia <david.ardia@@unine.ch> and Jean-Philippe Gagnon Fleury.
+#' @references Ardia, D., Boudt, K. (2015).  Implied expected returns and the
+#' choice of a mean-variance efficient portfolio proxy.  \emph{Journal of
+#' Portfolio Management} \bold{41} (4), pp.68--81.
+#' 
+#' Best, M. J., Grauer, R. R., (1985).  Capital asset pricing compatible with
+#' observed market value weights.  \emph{Journal of Finance} \bold{40}(5),
+#' pp.85--103.
+#' 
+#' Black, F., Litterman, R., (September-October 1992).  Global portfolio
+#' optimization.  \emph{Financial Analyst Journal} \bold{48}(5), pp.28--43.
+#' @keywords htest
+#' @examples
+#' # For the examples, we simply generate a 100 x 25 random matrix.
+#' set.seed(3214)
+#' T = 100
+#' N = 25
+#' rets = matrix(rnorm(T * N), nrow = T, ncol = N)
+#' 
+#' mu = meanEstimation(rets)
+#' Sigma = covEstimation(rets)
+#' w = rep(1, N)/N
+#' 
+#' # Computes the implied expected returns by Black-Litterman with gamma = 0.89.
+#' impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = "bl"))
+#' 
+#' # Computes the implied expected returns by Black-Litterman with gamma = 1.
+#' impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = "bl", gamma = 1))
+#' 
+#' # Computes the impled expected returns.
+#' impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = "regression"))
+#' 
+#' # Compute the robust implied expected returns. impliedReturns(mu = mu, Sigma =
+#' # Sigma, w = w, control = list(type = 'regression', reg = 'robust'))
+#' 
+#' # Compute the constraint implied expected returns. impliedReturns(mu = mu, Sigma
+#' # = Sigma, w = w, control = list(type = 'regression', reg = 'constraint'))
+#' @export
+
 impliedReturns = function(rets = NULL, mu = NULL, Sigma = NULL, semiDev = NULL, w = NULL, control = list()){
-  #########################################################################################  
-  # Compute the implied expected returns 
-  #########################################################################################
   
   ctr = .ctrImpliedReturns(control)
   

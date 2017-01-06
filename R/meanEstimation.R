@@ -1,16 +1,62 @@
+#' @name meanEstimation
+#' @title Estimation of mean returns
+#' @description Function which is used to compute the estimation of the mean returns.
+#' @details The argument \code{control} is a list that can supply any of the following
+#' components:
+#' \itemize{ 
+#' \item \code{type} method used to estimate the mean returns,
+#' among \code{"naive"}, \code{"ewma"}, \code{"bs"} and \code{"mart"} where:
+#' 
+#' \code{"naive"} is used to compute the arithmetic mean of the returns.
+#' 
+#' \code{"ewma"} is used to compute the exponential weighted moving average
+#' mean of the returns.  The data must be sorted from the oldest to the latest.
+#' 
+#' \code{"bs"} is used to compute the Bayes-Stein estimation.
+#' 
+#' \code{"mart"} is used to compute the Martinelli implied returns.
+#' 
+#' Default: \code{type = "naive"}.
+#' 
+#' \item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
+#' }
+#' 
+#' @param rets a \eqn{(T \times N)}{(T x N)} matrix of past returns.
+#' @param control control parameters (see *Details*).
+#' @return A \eqn{(N \times 1)}{(N x 1)} vector of expected returns.
+#' @author David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
+#' @references Jorion, P. (2004).  Bayes-Stein Estimation for Portfolio
+#' Analysis \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3),
+#' pp.279--292.
+#' @keywords htest
+#' @examples
+#' # For the examples, we simply generate a 100 x 25 random matrix.
+#' set.seed(3214)
+#' T = 100
+#' N = 25
+#' rets = matrix(rnorm(T * N), nrow = T, ncol = N)
+#' 
+#' # Computes the naive estimation of the mean.
+#' meanEstimation(rets)
+#' 
+#' # Computes the naive estimation of the mean.
+#' meanEstimation(rets, control = list(type = "naive"))
+#' 
+#' # Computes the ewma estimation of the mean with default lambda = 0.94.
+#' meanEstimation(rets, control = list(type = "ewma"))
+#' 
+#' # Computes the ewma estimation of the mean with lambda = 0.9.
+#' meanEstimation(rets, control = list(type = "ewma", lambda = 0.9))
+#' 
+#' # Computes the Martinelli's estimation of the mean.
+#' meanEstimation(rets, control = list(type = "mart"))
+#' 
+#' # Computes the Bayes-Stein's estimation of the mean.
+#' meanEstimation(rets, control = list(type = "bs"))
+#' @export
+
 meanEstimation = function(rets, control = list()){
-  #########################################################################################  
-  # Compute the estimation of the mean 
-  # INPUTs
-  #   rets     : matrix (T x N) returns
-  #   control  : a control list 
-  #   The argument control is a list that can supply any of the following components
-  #     type   : "naive", "ewma", "bs", "mart"  default = "naive"
-  #     lambda : default = 0.94 
-  # OUTPUTs
-  #   mu : vector (N x 1) mean
-  #########################################################################################
-  
+
   if (missing(rets)){
     stop ('rets is missing')
   }

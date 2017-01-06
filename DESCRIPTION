@@ -1,9 +1,15 @@
 Package: RiskPortfolios
-Version: 2.00.06
-Date: 2016-12-31
+Version: 2.00.07
+Date: 2017-01-06
 Title: Computation of Risk-Based Portfolios
-Author: David Ardia, Kris Boudt and Jean-Philippe Gagnon-Fleury 
+Author: David Ardia, Kris Boudt and Jean-Philippe Gagnon-Fleury
 Maintainer: David Ardia <david.ardia@unine.ch>
-Imports: MASS, quadprog, nloptr
-Description: RiskPortfolios is a collection of functions designed to compute risk-based portfolios.
+Imports:
+    MASS,
+    quadprog,
+    nloptr
+Description: RiskPortfolios is a collection of functions designed to compute
+    risk-based portfolios.
 License: GPL (>=2)
+RoxygenNote: 5.0.1
+Suggests: testthat
