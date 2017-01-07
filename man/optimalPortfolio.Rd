@@ -28,16 +28,16 @@ The argument \code{control} is a list that can supply any of the following
 components: 
 \itemize{
 \item \code{type} method used to compute the
-optimal portfolio, among \code{"mv"}, \code{"minvol"}, \code{"invvol"},
-\code{"erc"}, \code{"maxdiv"} and \code{"riskeff"} where: 
+optimal portfolio, among \code{'mv'}, \code{'minvol'}, \code{'invvol'},
+\code{'erc'}, \code{'maxdiv'} and \code{'riskeff'} where: 
 
-\code{"mv"} is used to compute the weights of the mean-variance portfolio. The weights are
+\code{'mv'} is used to compute the weights of the mean-variance portfolio. The weights are
 computed following this equation: \deqn{w = \frac{1}{\gamma} \Sigma^{-1}
 \mu }{ w = 1 / \gamma \Sigma^{-1} \mu}. 
 
-\code{"minvol"} is used to compute the weights of the minimum variance portfolio.  
+\code{'minvol'} is used to compute the weights of the minimum variance portfolio.  
 
-\code{"erc"} is used to compute the weights of the equal-risk-contribution portfolio. For a 
+\code{'erc'} is used to compute the weights of the equal-risk-contribution portfolio. For a 
 portfolio \eqn{w}, the percentage volatility risk contribution of the i-th
 asset in the portfolio is given by: 
 \deqn{\% RC_i = \frac{ w_i {[\Sigma w]}_i}{w' \Sigma w} }{ RC_i = w_i[\Sigma w]_i / (w' \Sigma w)}. 
@@ -45,11 +45,11 @@ Then we compute the optimal portfolio by solving the following optimization prob
 \deqn{w = argmin \left\{ \sum_{i=1}^N (\% RC_i - \frac{1}{N})^2 \right\}
 }{ argmin { \sum_{i=1}^{N} (RC_i - 1/N)^2} }.
 
-\code{"maxdiv"} is used to compute the weights of the maximum diversification portfolio where:
+\code{'maxdiv'} is used to compute the weights of the maximum diversification portfolio where:
 \deqn{ DR(w) = \frac{ w' \sigma}{\sqrt{w' \Sigma w} } \geq 1 }{ DR(w) = (w'
 \sigma)/(\sqrt(w' \Sigma w)) \ge 1} is used in the optimization problem.
 
-\code{"riskeff"} is used to compute the weights of the risk-efficient
+\code{'riskeff'} is used to compute the weights of the risk-efficient
 portfolio: \deqn{w = {argmax}\left\{ \frac{w' J \xi}{ \sqrt{w' \Sigma w}
 }\right\} }{w = argmax ( w'J \xi)\sqrt(w'\Sigma w)} where \eqn{J} is a
 \eqn{(N \times 10)}{(N x 10)} matrix of zeros whose \eqn{(i,j)}-th element
@@ -59,9 +59,9 @@ is one if the semi-deviation of stock \eqn{i} belongs to decile
 Default: \code{type = 'mv'}.
 
 \item \code{constraint} constraint used for the optimization, among
-\code{"none"}, \code{"lo"} and \code{'gross'} where: \code{"none"} is used to 
+\code{'none'}, \code{'lo'} and \code{'gross'} where: \code{'none'} is used to 
 compute the unconstraint portfolio, \code{'lo'} is the long-only constraint and 
-\code{"gross"} is the gross constraint. Default: \code{constraint = "none"}. 
+\code{'gross'} is the gross constraint. Default: \code{constraint = 'none'}. 
 
 \item \code{gross.c} gross exposure constraint. Default: \code{gross.c = 1.6}. 
 
@@ -88,106 +88,106 @@ optimalPortfolio(mu = mu, Sigma = Sigma)
 optimalPortfolio(mu = mu, Sigma = Sigma, control = list(gamma = 1))
 
 # Computes the mean-variance portfolio with without and gamma = 0.89.
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = "mv"))
+optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv'))
 
 # Computes the mean-variance portfolio without constraint and gamma =
 # 0.89.
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = "mv", 
-    constraint = "none"))
+optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
+    constraint = 'none'))
 
 # Computes the mean-variance portfolio with the long only constraint
 # and gamma = 0.89.
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = "mv", 
-    constraint = "lo"))
+optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
+    constraint = 'lo'))
 
 # Computes the mean-variance portfolio with the gross constraint,
 # gross constraint parameter = 1.6 and gamma = 0.89.
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = "mv", 
-    constraint = "gross"))
+optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
+    constraint = 'gross'))
 
 # Computes the mean-variance portfolio with the gross constraint,
 # gross constraint parameter = 1.2 and gamma = 0.89.
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = "mv", 
-    constraint = "gross", gross.c = 1.2))
+optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
+    constraint = 'gross', gross.c = 1.2))
 
 # Computes the minimum volatility portfolio without constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "minvol"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol'))
 
 # Computes the minimum volatility portfolio without constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "minvol", constraint = "none"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'none'))
 
 # Computes the minimim volatility portfolio with the long only
 # constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "minvol", constraint = "lo"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'lo'))
 
 # Computes the minimum volatility portfolio with the gross constraint
 # and the gross constraint parameter = 1.6.
-optimalPortfolio(Sigma = Sigma, control = list(type = "minvol", constraint = "gross"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'gross'))
 
 # Computes the minimum volatility portfolio with the gross constraint
 # and the gross parameter = 1.2.
-optimalPortfolio(Sigma = Sigma, control = list(type = "minvol", constraint = "gross", 
+optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'gross', 
     gross.c = 1.2))
 
 # Computes the equal-risk-contribution portfolio without constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "erc"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'erc'))
 
 # Computes the equal-risk-contribution portfolio without constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "erc", constraint = "none"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'none'))
 
 # Computes the equal-risk-contribution portfolio with the long only
 # constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "erc", constraint = "lo"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'lo'))
 
 # Computes the equal-risk-contribution portfolio with the gross
 # constraint and the gross parameter = 1.6.
-optimalPortfolio(Sigma = Sigma, control = list(type = "erc", constraint = "gross"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'gross'))
 
 # Computes the equal-risk-contribution portfolio with the gross
 # constraint and the gross parameter = 1.2.
-optimalPortfolio(Sigma = Sigma, control = list(type = "erc", constraint = "gross", 
+optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'gross', 
     gross.c = 1.2))
 
 # Computes the maximum diversification portfolio without constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "maxdiv"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv'))
 
 # Computes the maximum diversification portfolio without constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "maxdiv", constraint = "none"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'none'))
 
 # Compute the maximum diversification portoflio with the long only
 # constraint.
-optimalPortfolio(Sigma = Sigma, control = list(type = "maxdiv", constraint = "lo"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'lo'))
 
 # Computes the maximum diversification portfolio with the gross
 # constraint and the gross parameter = 1.6.
-optimalPortfolio(Sigma = Sigma, control = list(type = "maxdiv", constraint = "gross"))
+optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'gross'))
 
 # Computes the maximum diversification portfolio with the gross
 # constraint and the gross parameter = 1.2.
-optimalPortfolio(Sigma = Sigma, control = list(type = "maxdiv", constraint = "gross", 
+optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'gross', 
     gross.c = 1.2))
 
 # Computes the risk-efficient portfolio without constraint.
-optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = "riskeff"))
+optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff'))
 
 # Computes the risk-efficient portfolio without constraint.
-optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = "riskeff", 
-    constraint = "none"))
+optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
+    constraint = 'none'))
 
 # Computes the risk-efficient portfolio with the long only
 # constraint.
-optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = "riskeff", 
-    constraint = "lo"))
+optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
+    constraint = 'lo'))
 
 # Computes the risk-efficient portfolio with the gross constraint and
 # the gross parameter = 1.6.
-optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = "riskeff", 
-    constraint = "gross"))
+optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
+    constraint = 'gross'))
 
 # Computes the risk-efficient portfolio with the gross constraint and
 # the gross parameter = 1.2.
-optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = "riskeff", 
-    constraint = "gross", gross.c = 1.2))
+optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
+    constraint = 'gross', gross.c = 1.2))
 }
 \author{
 David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.

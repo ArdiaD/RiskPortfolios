@@ -31,31 +31,31 @@ The argument \code{control} is a list that can supply any of the following
 components:
 \itemize{
 \item \code{type} method used to compute the implied returns,
-among \code{"regression"}, \code{"robust"}, \code{"constraint"} and \code{"rl"}
+among \code{'regression'}, \code{'robust'}, \code{'constraint'} and \code{'rl'}
 where:
 
-\code{"regression"} is use to compute the implied expected returns. The
+\code{'regression'} is use to compute the implied expected returns. The
 implied expected returns are solved by fitting the following regression:
 
 \deqn{\tilde{\mu} = a + b[\hat{\Sigma}\hat{w}]}{\tilde{\mu} = a +
 b[\hat{\Sigma}\hat{w}]}
 
-The option \code{"reg"} can be used with \code{"regression"} if you want a
-robust estimation or a constrained estimation. See \code{"reg"}.
+The option \code{'reg'} can be used with \code{'regression'} if you want a
+robust estimation or a constrained estimation. See \code{'reg'}.
 
-\code{"bl"} is used to compute the Black-Litterman implied expected returns.
+\code{'bl'} is used to compute the Black-Litterman implied expected returns.
 The Black-Litterman implied expected return is estimated by fitting the
 following regression:
 
 \deqn{\mu = l \iota + \gamma \Sigma w.}
 
-\item{list("reg")}{is used when type = \code{'regression'}. \code{reg} can
+\item{list('reg')}{is used when type = \code{'regression'}. \code{reg} can
 supply either \code{'robust'} or \code{'constraint'}.
 
-\code{"robust"} is used to compute the robust estimation of the implied
+\code{'robust'} is used to compute the robust estimation of the implied
 expected returns.
 
-\code{"constraint"} is used to compute the implied expected returns with the
+\code{'constraint'} is used to compute the implied expected returns with the
 restriction that the coefficient is larger than zero.
 
 The constraint implied expected return estimate \eqn{\tilde{\mu}} is given
@@ -80,13 +80,13 @@ Sigma = covEstimation(rets)
 w = rep(1, N)/N
 
 # Computes the implied expected returns by Black-Litterman with gamma = 0.89.
-impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = "bl"))
+impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = 'bl'))
 
 # Computes the implied expected returns by Black-Litterman with gamma = 1.
-impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = "bl", gamma = 1))
+impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = 'bl', gamma = 1))
 
 # Computes the impled expected returns.
-impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = "regression"))
+impliedReturns(mu = mu, Sigma = Sigma, w = w, control = list(type = 'regression'))
 
 # Compute the robust implied expected returns. impliedReturns(mu = mu, Sigma =
 # Sigma, w = w, control = list(type = 'regression', reg = 'robust'))

@@ -23,11 +23,11 @@ components:
 
 \itemize{
 \item \code{type} method used to compute the semideviation
-vector, among \code{"naive"} and \code{"ewma"} where:
+vector, among \code{'naive'} and \code{'ewma'} where:
 
-\code{"naive"} is used to compute the simple semideviation.
+\code{'naive'} is used to compute the simple semideviation.
 
-\code{"ewma"} is used to compute the exponential weighted moving average
+\code{'ewma'} is used to compute the exponential weighted moving average
 semideviation. The data must be sorted from the oldest to the latest.
 
 The semideviation for one stock is computed as follows. First we select the
@@ -38,7 +38,7 @@ for each observation at its corresponding time \eqn{t} is computed as \eqn{w
 weights is then normalized.  Finally, the semideviation is obtained as the
 weighted standard deviation.
 
-Default: \code{type = "naive"}.
+Default: \code{type = 'naive'}.
 
 \item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
 }
@@ -53,13 +53,13 @@ rets = matrix(rnorm(T * N), nrow = T, ncol = N)
 semidevEstimation(rets)
 
 # Computes the naive estimation of the semideviation.
-semidevEstimation(rets, control = list(type = "naive"))
+semidevEstimation(rets, control = list(type = 'naive'))
 
 # Computes the ewma estimation of the semideviation. Default lambda = 0.94.
-semidevEstimation(rets, control = list(type = "ewma"))
+semidevEstimation(rets, control = list(type = 'ewma'))
 
 # Computes the ewma estimation of the semideviation. Lambda = 0.9.
-semidevEstimation(rets, control = list(type = "ewma", lambda = 0.9))
+semidevEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 }
 \author{
 David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.

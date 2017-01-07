@@ -22,18 +22,18 @@ The argument \code{control} is a list that can supply any of the following
 components:
 \itemize{ 
 \item \code{type} method used to estimate the mean returns,
-among \code{"naive"}, \code{"ewma"}, \code{"bs"} and \code{"mart"} where:
+among \code{'naive'}, \code{'ewma'}, \code{'bs'} and \code{'mart'} where:
 
-\code{"naive"} is used to compute the arithmetic mean of the returns.
+\code{'naive'} is used to compute the arithmetic mean of the returns.
 
-\code{"ewma"} is used to compute the exponential weighted moving average
+\code{'ewma'} is used to compute the exponential weighted moving average
 mean of the returns.  The data must be sorted from the oldest to the latest.
 
-\code{"bs"} is used to compute the Bayes-Stein estimation.
+\code{'bs'} is used to compute the Bayes-Stein estimation.
 
-\code{"mart"} is used to compute the Martinelli implied returns.
+\code{'mart'} is used to compute the Martinelli implied returns.
 
-Default: \code{type = "naive"}.
+Default: \code{type = 'naive'}.
 
 \item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
 }
@@ -49,19 +49,19 @@ rets = matrix(rnorm(T * N), nrow = T, ncol = N)
 meanEstimation(rets)
 
 # Computes the naive estimation of the mean.
-meanEstimation(rets, control = list(type = "naive"))
+meanEstimation(rets, control = list(type = 'naive'))
 
 # Computes the ewma estimation of the mean with default lambda = 0.94.
-meanEstimation(rets, control = list(type = "ewma"))
+meanEstimation(rets, control = list(type = 'ewma'))
 
 # Computes the ewma estimation of the mean with lambda = 0.9.
-meanEstimation(rets, control = list(type = "ewma", lambda = 0.9))
+meanEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 
 # Computes the Martinelli's estimation of the mean.
-meanEstimation(rets, control = list(type = "mart"))
+meanEstimation(rets, control = list(type = 'mart'))
 
 # Computes the Bayes-Stein's estimation of the mean.
-meanEstimation(rets, control = list(type = "bs"))
+meanEstimation(rets, control = list(type = 'bs'))
 }
 \author{
 David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
