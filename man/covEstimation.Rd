@@ -83,48 +83,48 @@ chosen to estimate the covariance matrix. Default: \code{K = 1}.}
 Part of the code is inspired from the Matlab code by Ledoit and Wolf.
 }
 \examples{
-# For the examples, we simply generate a 100 x 25 random matrix.
+# For the examples, we simply generate a 100 x 25 random matrix
 set.seed(3214)
 T = 100
 N = 25
 rets = matrix(rnorm(T * N), nrow = T, ncol = N)
 
-# Computes the naive covariance estimation.
+# Naive covariance estimation
 covEstimation(rets)
 
-# Computes the ewma estimation of the covariance with default lambda = 0.94.
+# Ewma estimation of the covariance with default lambda = 0.94
 covEstimation(rets, control = list(type = 'ewma'))
 
-# Computes the ewma estimation of the covariance with default lambda = 0.90.
+# Ewma estimation of the covariance with default lambda = 0.90
 covEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 
-# Computes the factor estimation of the covariance with dafault K = 1.
+# Factor estimation of the covariance with dafault K = 1
 covEstimation(rets, control = list(type = 'factor'))
 
-# Computes the factor estimation of the covariance with K = 3.
+# Factor estimation of the covariance with K = 3
 covEstimation(rets, control = list(type = 'factor', K = 3))
 
-# Computes the Ledot-Wolf's estimation of the covariance.
+# Ledot-Wolf's estimation of the covariance
 covEstimation(rets, control = list(type = 'lw'))
 
-# Shrinkage of the covariance matrix using constant correlation matrix.
+# Shrinkage of the covariance matrix using constant correlation matrix
 covEstimation(rets, control = list(type = 'const'))
 
 # Shrinkage of the covariance matrix towards constant correlation matrix by
 # Ledoit-Wolf.
 covEstimation(rets, control = list(type = 'cor'))
 
-# Shrinkage of the covariance matrix towards one-parameter matrix.
+# Shrinkage of the covariance matrix towards one-parameter matrix
 covEstimation(rets, control = list(type = 'oneparm'))
 
-# Shrinkage of the covaraince matrix towards diagonal matrix.
+# Shrinkage of the covaraince matrix towards diagonal matrix
 covEstimation(rets, control = list(type = 'diag'))
 
-# Shrinkage of the covariance matrix for large data set.
+# Shrinkage of the covariance matrix for large data set
 covEstimation(rets, control = list(type = 'large'))
 }
 \author{
-David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
+David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 }
 \references{
 Herold, U., Maurer, R. (2006).  Portfolio choice and estimation

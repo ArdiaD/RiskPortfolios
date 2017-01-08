@@ -23,7 +23,7 @@
 #' }{ argmin { \sum_{i=1}^{N} (RC_i - 1/N)^2} }.
 #' 
 #' \code{'maxdiv'} is used to compute the weights of the maximum diversification portfolio where:
-#' \deqn{ DR(w) = \frac{ w' \sigma}{\sqrt{w' \Sigma w} } \geq 1 }{ DR(w) = (w'
+#' \deqn{DR(w) = \frac{ w' \sigma}{\sqrt{w' \Sigma w} } \geq 1 }{ DR(w) = (w'
 #' \sigma)/(\sqrt(w' \Sigma w)) \ge 1} is used in the optimization problem.
 #' 
 #' \code{'riskeff'} is used to compute the weights of the risk-efficient
@@ -32,6 +32,8 @@
 #' \eqn{(N \times 10)}{(N x 10)} matrix of zeros whose \eqn{(i,j)}-th element
 #' is one if the semi-deviation of stock \eqn{i} belongs to decile
 #' \eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}. 
+#' 
+#' \code{'invvol'} is the inverse volatility portfolio.
 #' 
 #' Default: \code{type = 'mv'}.
 #' 
@@ -52,7 +54,9 @@
 #' Default: \code{semiDev = NULL}.
 #' @param control control parameters (see *Details*).
 #' @return A \eqn{(N \times 1)}{(N x 1)} vector of optimal portfolio weights.
-#' @author David Ardia <david.ardia@@unine.ch> and Jean-Philippe Gagnon Fleury.
+#' @note The long-only and the gross constraints are implemented for \code{'mv'}, \code{'minvol'} and 
+#' \code{'maxdiv'} portfolios.
+#' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @references Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
 #' Efficient indexation: An alternatice to cap-weightes indices.  \emph{Journal
 #' of Investment Management} \bold{9}(4), pp.1--23.
@@ -102,115 +106,71 @@
 #' Sigma = covEstimation(rets)
 #' semiDev = semidevEstimation(rets)
 #' 
-#' # Computes the mean-variance portfolio without constraint and gamma =
-#' # 0.89.
+#' # Mean-variance portfolio without constraint and gamma = 0.89
 #' optimalPortfolio(mu = mu, Sigma = Sigma)
 #' 
-#' # Computes the mean-variance portfolio without constraint and gamma =
-#' # 1.
+#' # Mean-variance portfolio without constraint and gamma = 1
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(gamma = 1))
 #' 
-#' # Computes the mean-variance portfolio with without and gamma = 0.89.
+#' # Mean-variance portfolio with without and gamma = 0.89
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv'))
 #' 
-#' # Computes the mean-variance portfolio without constraint and gamma =
-#' # 0.89.
+#' # Mean-variance portfolio without constraint and gamma = 0.89
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
 #'     constraint = 'none'))
 #' 
-#' # Computes the mean-variance portfolio with the long only constraint
-#' # and gamma = 0.89.
+#' # Mean-variance portfolio with the long-only constraint and gamma = 0.89
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
 #'     constraint = 'lo'))
 #' 
-#' # Computes the mean-variance portfolio with the gross constraint,
-#' # gross constraint parameter = 1.6 and gamma = 0.89.
+#' # Mean-variance portfolio with the gross constraint, gross constraint parameter = 1.6 and gamma = 0.89
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
 #'     constraint = 'gross'))
 #' 
-#' # Computes the mean-variance portfolio with the gross constraint,
-#' # gross constraint parameter = 1.2 and gamma = 0.89.
+#' # Mean-variance portfolio with the gross constraint, gross constraint parameter = 1.2 and gamma = 0.89
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
 #'     constraint = 'gross', gross.c = 1.2))
 #' 
-#' # Computes the minimum volatility portfolio without constraint.
+#' # Minimum volatility portfolio without constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol'))
 #' 
-#' # Computes the minimum volatility portfolio without constraint.
+#' # Minimum volatility portfolio without constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'none'))
 #' 
-#' # Computes the minimim volatility portfolio with the long only
-#' # constraint.
+#' # Minimim volatility portfolio with the long-only constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'lo'))
 #' 
-#' # Computes the minimum volatility portfolio with the gross constraint
-#' # and the gross constraint parameter = 1.6.
+#' # Minimum volatility portfolio with the gross constraint and the gross constraint parameter = 1.6
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'gross'))
 #' 
-#' # Computes the minimum volatility portfolio with the gross constraint
-#' # and the gross parameter = 1.2.
+#' # Minimum volatility portfolio with the gross constraint and the gross parameter = 1.2
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'gross', 
 #'     gross.c = 1.2))
 #' 
-#' # Computes the equal-risk-contribution portfolio without constraint.
+#' # Equal-risk-contribution portfolio without constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'erc'))
 #' 
-#' # Computes the equal-risk-contribution portfolio without constraint.
+#' # Equal-risk-contribution portfolio without constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'none'))
 #' 
-#' # Computes the equal-risk-contribution portfolio with the long only
-#' # constraint.
+#' # Equal-risk-contribution portfolio with the long-only constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'lo'))
 #' 
-#' # Computes the equal-risk-contribution portfolio with the gross
-#' # constraint and the gross parameter = 1.6.
-#' optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'gross'))
-#' 
-#' # Computes the equal-risk-contribution portfolio with the gross
-#' # constraint and the gross parameter = 1.2.
-#' optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'gross', 
-#'     gross.c = 1.2))
-#' 
-#' # Computes the maximum diversification portfolio without constraint.
+#' # Maximum diversification portfolio without constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv'))
 #' 
-#' # Computes the maximum diversification portfolio without constraint.
-#' optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'none'))
-#' 
-#' # Compute the maximum diversification portoflio with the long only
-#' # constraint.
+#' # Maximum diversification portoflio with the long-only constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'lo'))
 #' 
-#' # Computes the maximum diversification portfolio with the gross
-#' # constraint and the gross parameter = 1.6.
-#' optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'gross'))
-#' 
-#' # Computes the maximum diversification portfolio with the gross
-#' # constraint and the gross parameter = 1.2.
-#' optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'gross', 
-#'     gross.c = 1.2))
-#' 
-#' # Computes the risk-efficient portfolio without constraint.
+#' # Risk-efficient portfolio without constraint
 #' optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff'))
 #' 
-#' # Computes the risk-efficient portfolio without constraint.
-#' optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
-#'     constraint = 'none'))
-#' 
-#' # Computes the risk-efficient portfolio with the long only
-#' # constraint.
+#' # Risk-efficient portfolio with the long-only constraint
 #' optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
 #'     constraint = 'lo'))
-#' 
-#' # Computes the risk-efficient portfolio with the gross constraint and
-#' # the gross parameter = 1.6.
-#' optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
-#'     constraint = 'gross'))
-#' 
-#' # Computes the risk-efficient portfolio with the gross constraint and
-#' # the gross parameter = 1.2.
-#' optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
-#'     constraint = 'gross', gross.c = 1.2))
+#'     
+#' # Inverse volatility portfolio
+#' optimalPortfolio(Sigma = Sigma, control = list(type = 'invvol'))
 #' @export
 optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list()) {
   
@@ -293,7 +253,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   }
   if (ctr$constraint[1] == "none") {
     invSigmamu <- solve(Sigma, mu)
-    w <- (1/ctr$gamma[1]) * invSigmamu/sum(invSigmamu)  # David, rf = 0 !??
+    w <- (1/ctr$gamma[1]) * invSigmamu/sum(invSigmamu)  
   } else if (ctr$constraint[1] == "lo") {
     n <- dim(Sigma)[1]
     Dmat <- ctr$gamma[1] * Sigma
@@ -314,9 +274,10 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     if (is.null(w0)) {
       w0 <- rep(1/n, n)
     }
-    w <- nloptr::slsqp(x0 = w0, fn = .meanvar, hin = .grossConstraint, 
-                       heq = .eqConstraint, nl.info = FALSE, control = list(xtol_rel = 1e-18, 
-                                                                            check_derivatives = FALSE))$par
+    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    w <- nloptr::slsqp(x0 = w0, fn = .meanvar, hin = ..grossContraint, 
+                       heq = .eqConstraint, nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-18, check_derivatives = FALSE))$par
   } else {
     stop("control$constraint not well defined")
   }
@@ -340,7 +301,6 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     w <- quadprog::solve.QP(Dmat = Sigma, dvec = dvec, Amat = Amat, 
                             bvec = bvec, meq = 1)$solution
   } else if (ctr$constraint[1] == "gross") {
-    
     .minvol <- function(w) {
       Sigmaw <- crossprod(Sigma, w)
       v <- as.numeric(crossprod(w, Sigmaw))
@@ -352,9 +312,10 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     if (is.null(w0)) {
       w0 <- rep(1/n, n)
     }
-    w <- nloptr::slsqp(x0 = w0, fn = .minvol, hin = .grossConstraint, 
-                       heq = .eqConstraint, nl.info = FALSE, control = list(xtol_rel = 1e-18, 
-                                                                            check_derivatives = FALSE))$par
+    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    w <- nloptr::slsqp(x0 = w0, fn = .minvol, hin = ..grossContraint, 
+                       heq = .eqConstraint, nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-18, check_derivatives = FALSE))$par
   } else {
     stop("control$constraint not well defined")
   }
@@ -382,17 +343,16 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     return(d)
   }
   
+  # DA currently not implemented for long-only and gross constraints
   if (ctr$constraint[1] == "none") {
-    w <- nloptr::slsqp(x0 = w0, fn = .pRC, heq = .eqConstraint, lower = rep(0, 
-                                                                            n), nl.info = FALSE, control = list(xtol_rel = 1e-08, check_derivatives = FALSE))$par
+    w <- nloptr::slsqp(x0 = w0, fn = .pRC, heq = .eqConstraint, lower = rep(0, n), nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE))$par
   } else if (ctr$constraint[1] == "lo") {
-    w <- nloptr::slsqp(x0 = w0, fn = .pRC, heq = .eqConstraint, lower = rep(0, 
-                                                                            n), nl.info = FALSE, control = list(xtol_rel = 1e-08, check_derivatives = FALSE, 
-                                                                                                                maxeval = 2000))$par
+    w <- nloptr::slsqp(x0 = w0, fn = .pRC, heq = .eqConstraint, lower = rep(0, n), nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE, maxeval = 2000))$par
   } else if (ctr$constraint[1] == "gross") {
-    w <- nloptr::slsqp(x0 = w0, fn = .pRC, heq = .eqConstraint, lower = rep(0, 
-                                                                            n), nl.info = FALSE, control = list(xtol_rel = 1e-08, check_derivatives = FALSE, 
-                                                                                                                maxeval = 2000))$par
+    w <- nloptr::slsqp(x0 = w0, fn = .pRC, heq = .eqConstraint, lower = rep(0, n), nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE, maxeval = 2000))$par
   } else {
     stop("control$constraint not well defined")
   }
@@ -419,16 +379,17 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   }
   if (ctr$constraint[1] == "none") {
     w <- nloptr::slsqp(x0 = w0, fn = .divRatio, heq = .eqConstraint, 
-                       nl.info = FALSE, control = list(xtol_rel = 1e-08, check_derivatives = FALSE, 
-                                                       maxeval = 2000))$par
+                       nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE, maxeval = 2000))$par
   } else if (ctr$constraint[1] == "lo") {
     w <- nloptr::slsqp(x0 = w0, fn = .divRatio, lower = rep(0, n), 
-                       heq = .eqConstraint, nl.info = FALSE, control = list(xtol_rel = 1e-08, 
-                                                                            check_derivatives = FALSE, maxeval = 2000))$par
+                       heq = .eqConstraint, nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE, maxeval = 2000))$par
   } else if (ctr$constraint[1] == "gross") {
-    w <- nloptr::slsqp(x0 = w0, fn = .divRatio, hin = .grossConstraint, 
-                       heq = .eqConstraint, nl.info = FALSE, control = list(xtol_rel = 1e-08, 
-                                                                            check_derivatives = FALSE, maxeval = 2000))$par
+    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    w <- nloptr::slsqp(x0 = w0, fn = .divRatio, hin = ..grossContraint, 
+                       heq = .eqConstraint, nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE, maxeval = 2000))$par
   } else {
     stop("control$constraint not well defined")
   }
@@ -467,7 +428,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     epsilon[i - 1] <- median(semiDev[pos])
   }
   Jepsilon <- crossprod(t(J), epsilon)
-  # !!! TOFIX !!! additional constraints used to stabilize optimization
+  # DA Additional constraints used to stabilize optimization
   LB <- (1/(2 * n)) * rep(1, n)
   UB <- (2/n) * rep(1, n)
   
@@ -489,16 +450,16 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   
   if (ctr$constraint[1] == "none") {
     w <- nloptr::slsqp(x0 = w0, fn = .distRiskEff, heq = .eqConstraint, 
-                       lower = LB, upper = UB, nl.info = FALSE, control = list(xtol_rel = 1e-08, 
-                                                                               check_derivatives = FALSE, maxeval = 2000))$par
+                       lower = LB, upper = UB, nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE, maxeval = 2000))$par
   } else if (ctr$constraint[1] == "lo") {
     w <- nloptr::slsqp(x0 = w0, fn = .distRiskEff, heq = .eqConstraint, 
-                       lower = LB, upper = UB, nl.info = FALSE, control = list(xtol_rel = 1e-08, 
-                                                                               check_derivatives = FALSE, maxeval = 2000))$par
+                       lower = LB, upper = UB, nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE, maxeval = 2000))$par
   } else if (ctr$constraint[1] == "gross") {
     w <- nloptr::slsqp(x0 = w0, fn = .distRiskEff, heq = .eqConstraint, 
-                       lower = LB, upper = UB, nl.info = FALSE, control = list(xtol_rel = 1e-08, 
-                                                                               check_derivatives = FALSE, maxeval = 2000))$par
+                       lower = LB, upper = UB, nl.info = FALSE, 
+                       control = list(xtol_rel = 1e-08, check_derivatives = FALSE, maxeval = 2000))$par
   } else {
     stop("control$constraint not well defined")
   }
@@ -511,6 +472,6 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
 }
 
 # DA here 1.6 is hard-coded, this should be changed
-.grossConstraint <- function(w) {
-  return(1.6 - norm(as.matrix(w), type = "1"))
+.grossConstraint <- function(w, gross.c) {
+  return(gross.c - norm(as.matrix(w), type = "1"))
 }

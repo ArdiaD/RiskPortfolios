@@ -45,26 +45,26 @@ T = 100
 N = 25
 rets = matrix(rnorm(T * N), nrow = T, ncol = N)
 
-# Computes the naive estimation of the mean.
+# Naive estimation of the mean
 meanEstimation(rets)
 
-# Computes the naive estimation of the mean.
+# Naive estimation of the mean
 meanEstimation(rets, control = list(type = 'naive'))
 
-# Computes the ewma estimation of the mean with default lambda = 0.94.
+# Ewma estimation of the mean with default lambda = 0.94
 meanEstimation(rets, control = list(type = 'ewma'))
 
-# Computes the ewma estimation of the mean with lambda = 0.9.
+# Ewma estimation of the mean with lambda = 0.9
 meanEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 
-# Computes the Martinelli's estimation of the mean.
+# Martinelli's estimation of the mean
 meanEstimation(rets, control = list(type = 'mart'))
 
-# Computes the Bayes-Stein's estimation of the mean.
+# Bayes-Stein's estimation of the mean
 meanEstimation(rets, control = list(type = 'bs'))
 }
 \author{
-David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
+David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 }
 \references{
 Jorion, P. (2004).  Bayes-Stein Estimation for Portfolio

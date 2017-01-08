@@ -49,20 +49,20 @@ T = 100
 N = 25
 rets = matrix(rnorm(T * N), nrow = T, ncol = N)
 
-# Computes the naive semideviation estimation.
+# Naive semideviation estimation
 semidevEstimation(rets)
 
-# Computes the naive estimation of the semideviation.
+# Naive estimation of the semideviation
 semidevEstimation(rets, control = list(type = 'naive'))
 
-# Computes the ewma estimation of the semideviation. Default lambda = 0.94.
+# Ewma estimation of the semideviation. Default lambda = 0.94
 semidevEstimation(rets, control = list(type = 'ewma'))
 
-# Computes the ewma estimation of the semideviation. Lambda = 0.9.
+# Ewma estimation of the semideviation. lambda = 0.9
 semidevEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 }
 \author{
-David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
+David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 }
 \keyword{htest}
 

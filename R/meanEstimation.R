@@ -24,8 +24,9 @@
 #' @param rets a \eqn{(T \times N)}{(T x N)} matrix of past returns.
 #' @param control control parameters (see *Details*).
 #' @return A \eqn{(N \times 1)}{(N x 1)} vector of expected returns.
-#' @author David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
-#' @references Jorion, P. (2004).  Bayes-Stein Estimation for Portfolio
+#' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
+#' @references 
+#' Jorion, P. (2004).  Bayes-Stein Estimation for Portfolio
 #' Analysis \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3),
 #' pp.279--292.
 #' @keywords htest
@@ -36,22 +37,22 @@
 #' N = 25
 #' rets = matrix(rnorm(T * N), nrow = T, ncol = N)
 #' 
-#' # Computes the naive estimation of the mean.
+#' # Naive estimation of the mean
 #' meanEstimation(rets)
 #' 
-#' # Computes the naive estimation of the mean.
+#' # Naive estimation of the mean
 #' meanEstimation(rets, control = list(type = 'naive'))
 #' 
-#' # Computes the ewma estimation of the mean with default lambda = 0.94.
+#' # Ewma estimation of the mean with default lambda = 0.94
 #' meanEstimation(rets, control = list(type = 'ewma'))
 #' 
-#' # Computes the ewma estimation of the mean with lambda = 0.9.
+#' # Ewma estimation of the mean with lambda = 0.9
 #' meanEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 #' 
-#' # Computes the Martinelli's estimation of the mean.
+#' # Martinelli's estimation of the mean
 #' meanEstimation(rets, control = list(type = 'mart'))
 #' 
-#' # Computes the Bayes-Stein's estimation of the mean.
+#' # Bayes-Stein's estimation of the mean
 #' meanEstimation(rets, control = list(type = 'bs'))
 #' @export
 meanEstimation <- function(rets, control = list()) {

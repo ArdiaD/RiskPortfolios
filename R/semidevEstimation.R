@@ -29,7 +29,7 @@
 #' @param rets a \eqn{(T \times N)}{(T x N)} matrix of past returns.
 #' @param control control parameters (see *Details*).
 #' @return A \eqn{(N \times 1)}{(N x 1)} vector of semideviations.
-#' @author David Ardia <david.ardia@unine.ch> and Jean-Philippe Gagnon Fleury.
+#' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @keywords htest
 #' @examples
 #' set.seed(3214)
@@ -37,16 +37,16 @@
 #' N = 25
 #' rets = matrix(rnorm(T * N), nrow = T, ncol = N)
 #' 
-#' # Computes the naive semideviation estimation.
+#' # Naive semideviation estimation
 #' semidevEstimation(rets)
 #' 
-#' # Computes the naive estimation of the semideviation.
+#' # Naive estimation of the semideviation
 #' semidevEstimation(rets, control = list(type = 'naive'))
 #' 
-#' # Computes the ewma estimation of the semideviation. Default lambda = 0.94.
+#' # Ewma estimation of the semideviation. Default lambda = 0.94
 #' semidevEstimation(rets, control = list(type = 'ewma'))
 #' 
-#' # Computes the ewma estimation of the semideviation. Lambda = 0.9.
+#' # Ewma estimation of the semideviation. lambda = 0.9
 #' semidevEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 #' @export
 semidevEstimation <- function(rets, control = list()) {
