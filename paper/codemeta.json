@@ -1,0 +1,37 @@
+{
+  "@context": "https://raw.githubusercontent.com/mbjones/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+    {
+      "@id": "http://orcid.org/0000-0002-3957-2474",
+      "@type": "Person",
+      "email": "david.ardia.ch@gmail.com",
+      "name": "David Ardia",
+      "affiliation": "University of Neuchâtel\nLaval University"
+    },
+    {
+      "@id": null,
+      "@type": "Person",
+      "email": null,
+      "name": "Kris Boudt",
+      "affiliation": "Vrije Universiteit Brussel\nVU University Amsterdam"
+    },
+    {
+      "@id": null,
+      "@type": "Person",
+      "email": null,
+      "name": "Jean-Philippe Gagnon-Fleury",
+      "affiliation": "PSP Investments"
+    }
+  ],
+  "identifier": null,
+  "codeRepository": "https://github.com/ArdiaD/RiskPortfolios",
+  "datePublished": "2017-01-08",
+  "dateModified": "2017-01-08",
+  "dateCreated": "2017-01-08",
+  "description": "Risk-based portfolios in R",
+  "keywords": "R software, portolios, optimization, risk-based",
+  "license": "GPL",
+  "title": "RiskPortfolios",
+  "version": "v2.00.07"
+}
