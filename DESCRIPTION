@@ -2,7 +2,13 @@ Package: RiskPortfolios
 Version: 2.00.09
 Date: 2017-01-09
 Title: Computation of Risk-Based Portfolios
-Author: David Ardia, Kris Boudt and Jean-Philippe Gagnon-Fleury
+Authors@R: c(person("David", "Ardia", role = c("aut", "cre"),
+                     email = "david.ardia.ch@gmail.com"),
+              person("Kris", "Boudt", role = "aut"),
+              person("Jean-Philippe", "Gagnon-Fleury", role = "aut"))
+Author: David Ardia [aut, cre],
+  Kris Boudt [aut],
+  Jean-Philippe Gagnon-Fleury [aut]
 Maintainer: David Ardia <david.ardia.ch@gmail.com>
 Imports:
     MASS,
