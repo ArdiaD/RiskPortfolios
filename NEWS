@@ -1,4 +1,9 @@
 Changes in Version 2.00.07 (DA)
+  o tests added
+  o doc fixed
+  o positivity fixed
+
+Changes in Version 2.00.07 (DA)
   o Roxygen documentation
   o testthat added
 

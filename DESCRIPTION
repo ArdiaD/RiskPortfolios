@@ -1,9 +1,9 @@
 Package: RiskPortfolios
-Version: 2.00.07
-Date: 2017-01-06
+Version: 2.00.08
+Date: 2017-01-09
 Title: Computation of Risk-Based Portfolios
 Author: David Ardia, Kris Boudt and Jean-Philippe Gagnon-Fleury
-Maintainer: David Ardia <david.ardia@unine.ch>
+Maintainer: David Ardia <david.ardia.ch@gmail.com>
 Imports:
     MASS,
     quadprog,
