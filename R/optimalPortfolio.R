@@ -123,11 +123,13 @@
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
 #'     constraint = 'lo'))
 #' 
-#' # Mean-variance portfolio with the gross constraint, gross constraint parameter = 1.6 and gamma = 0.89
+#' # Mean-variance portfolio with the gross constraint, 
+#' # gross constraint parameter = 1.6 and gamma = 0.89
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
 #'     constraint = 'gross'))
 #' 
-#' # Mean-variance portfolio with the gross constraint, gross constraint parameter = 1.2 and gamma = 0.89
+#' # Mean-variance portfolio with the gross constraint, 
+#' # gross constraint parameter = 1.2 and gamma = 0.89
 #' optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
 #'     constraint = 'gross', gross.c = 1.2))
 #' 
@@ -140,10 +142,12 @@
 #' # Minimim volatility portfolio with the long-only constraint
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'lo'))
 #' 
-#' # Minimum volatility portfolio with the gross constraint and the gross constraint parameter = 1.6
+#' # Minimum volatility portfolio with the gross constraint 
+#' # and the gross constraint parameter = 1.6
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'gross'))
 #' 
-#' # Minimum volatility portfolio with the gross constraint and the gross parameter = 1.2
+#' # Minimum volatility portfolio with the gross constraint 
+#' # and the gross parameter = 1.2
 #' optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'gross', 
 #'     gross.c = 1.2))
 #' 
@@ -261,6 +265,8 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     bvec <- c(1, rep(0, n))
     w <- quadprog::solve.QP(Dmat = Dmat, dvec = mu, Amat = Amat, bvec = bvec, 
                             meq = 1)$solution
+    w[w<0] <- 0
+    w <- w / sum(w)
   } else if (ctr$constraint[1] == "gross") {
     .meanvar <- function(w) {
       Sigmaw <- crossprod(Sigma, w)
@@ -300,6 +306,8 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     bvec <- c(1, rep(0, n))
     w <- quadprog::solve.QP(Dmat = Sigma, dvec = dvec, Amat = Amat, 
                             bvec = bvec, meq = 1)$solution
+    w[w<0] <- 0
+    w <- w / sum(w)
   } else if (ctr$constraint[1] == "gross") {
     .minvol <- function(w) {
       Sigmaw <- crossprod(Sigma, w)
