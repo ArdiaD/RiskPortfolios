@@ -28,10 +28,4 @@ Then check the help of the various files, and run the examples:
 
 R> library("RiskPortfolios")
 
-R> ?optimalPortfolio
-
-R> ?covEstimation
-
-R> ?meanEstimation
-
-R> ?semidevEstimation
+R> ?RiskPortfolios

@@ -1,4 +1,5 @@
 #' @name optimalPortfolio
+#' @aliases optimalPortfolio
 #' @title Optimal portfolio
 #' @description Function wich computes the optimal portfolio's weights.
 #' @details The argument \code{control} is a list that can supply any of the following
@@ -57,7 +58,8 @@
 #' @note The long-only and the gross constraints are implemented for \code{'mv'}, \code{'minvol'} and 
 #' \code{'maxdiv'} portfolios.
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
-#' @references Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
+#' @references 
+#' Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
 #' Efficient indexation: An alternatice to cap-weightes indices.  \emph{Journal
 #' of Investment Management} \bold{9}(4), pp.1--23.
 #' 
@@ -96,14 +98,17 @@
 #' \emph{Journal of Portfolio Management} \bold{34}, Summer,pp.34--41.
 #' @keywords optimize
 #' @examples
-#' # For the examples, we simply generate a 100 x 25 random matrix.
-#' set.seed(3214)
-#' T = 100
-#' N = 25
-#' rets = matrix(rnorm(T * N), nrow = T, ncol = N)
+#' # Load returns of assets or portfolios
+#' data("Industry_10")
+#' rets = Industry_10
 #' 
+#' # Mean estimation
 #' mu = meanEstimation(rets)
+#' 
+#' # Covariance estimation
 #' Sigma = covEstimation(rets)
+#' 
+#' # Semi-deviation estimation
 #' semiDev = semidevEstimation(rets)
 #' 
 #' # Mean-variance portfolio without constraint and gamma = 0.89
@@ -231,6 +236,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (!("gross.c" %in% nam) || is.null(control$gross.c)) {
     control$gross.c <- 1.6
   }
+  # DA LB and UB included for later extensions
   if (!("LB" %in% nam) || is.null(control$LB)) {
     control$LB <- NULL
   }

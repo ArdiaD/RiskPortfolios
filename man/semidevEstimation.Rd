@@ -44,10 +44,9 @@ Default: \code{type = 'naive'}.
 }
 }
 \examples{
-set.seed(3214)
-T = 100
-N = 25
-rets = matrix(rnorm(T * N), nrow = T, ncol = N)
+# Load returns of assets or portfolios
+data("Industry_10")
+rets = Industry_10
 
 # Naive semideviation estimation
 semidevEstimation(rets)

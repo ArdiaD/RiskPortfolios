@@ -1,4 +1,5 @@
 #' @name semidevEstimation
+#' @aliases semidevEstimation
 #' @title Estimation of the semideviation
 #' @description Function which computes the semideviation.
 #' @details The argument \code{control} is a list that can supply any of the following
@@ -32,10 +33,9 @@
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @keywords htest
 #' @examples
-#' set.seed(3214)
-#' T = 100
-#' N = 25
-#' rets = matrix(rnorm(T * N), nrow = T, ncol = N)
+#' # Load returns of assets or portfolios
+#' data("Industry_10")
+#' rets = Industry_10
 #' 
 #' # Naive semideviation estimation
 #' semidevEstimation(rets)

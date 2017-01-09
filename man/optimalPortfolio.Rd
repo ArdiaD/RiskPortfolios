@@ -75,14 +75,17 @@ The long-only and the gross constraints are implemented for \code{'mv'}, \code{'
 \code{'maxdiv'} portfolios.
 }
 \examples{
-# For the examples, we simply generate a 100 x 25 random matrix.
-set.seed(3214)
-T = 100
-N = 25
-rets = matrix(rnorm(T * N), nrow = T, ncol = N)
+# Load returns of assets or portfolios
+data("Industry_10")
+rets = Industry_10
 
+# Mean estimation
 mu = meanEstimation(rets)
+
+# Covariance estimation
 Sigma = covEstimation(rets)
+
+# Semi-deviation estimation
 semiDev = semidevEstimation(rets)
 
 # Mean-variance portfolio without constraint and gamma = 0.89

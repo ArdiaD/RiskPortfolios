@@ -1,4 +1,8 @@
-Changes in Version 2.00.07 (DA)
+Changes in Version 2.00.09 (DA)
+  o dataset added
+  o doc RiskPortfolios added
+
+Changes in Version 2.00.08 (DA)
   o tests added
   o doc fixed
   o positivity fixed

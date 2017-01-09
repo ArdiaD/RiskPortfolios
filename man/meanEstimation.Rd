@@ -39,11 +39,9 @@ Default: \code{type = 'naive'}.
 }
 }
 \examples{
-# For the examples, we simply generate a 100 x 25 random matrix.
-set.seed(3214)
-T = 100
-N = 25
-rets = matrix(rnorm(T * N), nrow = T, ncol = N)
+# Load returns of assets or portfolios
+data("Industry_10")
+rets = Industry_10
 
 # Naive estimation of the mean
 meanEstimation(rets)
