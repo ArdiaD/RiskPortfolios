@@ -555,8 +555,8 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   w <- nloptr::slsqp(x0 = ctr$w0, fn = .distRiskEff, 
                      hin = ..grossContraint,
                      heq = .eqConstraint, 
-                     lower = ctr$LB, 
-                     upper = ctr$UB, 
+                     lower = LB, 
+                     upper = UB, 
                      nl.info = FALSE, control = ctr$ctr.slsqp)$par
   
   w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
