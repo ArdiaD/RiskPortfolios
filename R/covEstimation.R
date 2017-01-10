@@ -69,21 +69,21 @@
 #' @note Part of the code is inspired from the Matlab code by Ledoit and Wolf.
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @references 
-#' Herold, U., Maurer, R. (2006).  Portfolio choice and estimation
-#' risk. A comparison of bayesian to heuristic approaches \emph{Astin bulletin}
-#' \bold{36}(1), pp.135--160.
+#' Herold, U., Maurer, R. (2006).  
+#' Portfolio choice and estimation risk. A comparison of Bayesian to heuristic approaches. 
+#' \emph{Astin bulletin} \bold{36}(1), pp.135--160. \doi{10.1017/S0515036100014434}.
 #' 
-#' Kolusheva, Daniela. (July 2008).  Out-of-sample Performance of Asset
-#' Allocation Strategies Ledoit, O., Wolf, M. (2002).  Improved estimation of
-#' the covariance matrix of stock returns with an application to portfolio
-#' selection \emph{Journal of Empirical Finance} \bold{10}, pp.603--621.
+#' Ledoit, O., Wolf, M. (2002).  
+#' Improved estimation of the covariance matrix of stock returns with an application to portfolio selection. 
+#' \emph{Journal of Empirical Finance} \bold{10}(5), pp.603--621. \doi{10.1016/S0927-5398(03)00007-0}.
 #' 
-#' Ledoit, O., Wolf, M. (2003).  Honey, I Shrunk the Sample Covariance Matrix.
-#' \emph{Journal of Portfolio Management} \bold{30}(4), pp.110--119.
+#' Ledoit, O., Wolf, M. (2003).  
+#' Honey, I Shrunk the Sample Covariance Matrix.
+#' \emph{Journal of Portfolio Management} \bold{30}(4), pp.110--119. \doi{10.3905/jpm.2004.110}.
 #' 
-#' Ledoit, O., Wolf, M. (2004).  A well-conditioned estimator for
-#' large-dimensional covariance matrices \emph{Journal of Multivariate
-#' Analysis} \bold{88}, pp.365--411.
+#' Ledoit, O., Wolf, M. (2004).  
+#' A well-conditioned estimator for large-dimensional covariance matrices.
+#' \emph{Journal of Multivariate Analysis} \bold{88}, pp.365--411. \doi{10.1016/S0047-259X(03)00096-4}.
 #' @keywords htest
 #' @examples
 #' # Load returns of assets or portfolios

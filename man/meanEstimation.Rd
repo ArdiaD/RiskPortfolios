@@ -65,9 +65,9 @@ meanEstimation(rets, control = list(type = 'bs'))
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 }
 \references{
-Jorion, P. (2004).  Bayes-Stein Estimation for Portfolio
-Analysis \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3),
-pp.279--292.
+Jorion, P. (2004).  
+Bayes-Stein estimation for portfolio analysis. 
+\emph{Journal of Finance and Quantitative Analysis} \bold{21}(3), pp.279--292. \doi{10.2307/2331042}.
 }
 \keyword{htest}
 

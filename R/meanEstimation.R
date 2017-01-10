@@ -27,9 +27,9 @@
 #' @return A \eqn{(N \times 1)}{(N x 1)} vector of expected returns.
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @references 
-#' Jorion, P. (2004).  Bayes-Stein Estimation for Portfolio
-#' Analysis \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3),
-#' pp.279--292.
+#' Jorion, P. (2004).  
+#' Bayes-Stein estimation for portfolio analysis. 
+#' \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3), pp.279--292. \doi{10.2307/2331042}.
 #' @keywords htest
 #' @examples
 #' # Load returns of assets or portfolios
