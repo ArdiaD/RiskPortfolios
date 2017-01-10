@@ -33,9 +33,11 @@ optimal portfolio, among \code{'mv'}, \code{'minvol'}, \code{'invvol'},
 
 \code{'mv'} is used to compute the weights of the mean-variance portfolio. The weights are
 computed following this equation: \deqn{w = \frac{1}{\gamma} \Sigma^{-1}
-\mu }{ w = 1 / \gamma \Sigma^{-1} \mu}. 
+\mu }{w = 1 / \gamma \Sigma^{-1} \mu}. 
 
 \code{'minvol'} is used to compute the weights of the minimum variance portfolio.  
+
+\code{'invvol'} is the inverse volatility portfolio.
 
 \code{'erc'} is used to compute the weights of the equal-risk-contribution portfolio. For a 
 portfolio \eqn{w}, the percentage volatility risk contribution of the i-th
@@ -56,23 +58,29 @@ portfolio: \deqn{w = {argmax}\left\{ \frac{w' J \xi}{ \sqrt{w' \Sigma w}
 is one if the semi-deviation of stock \eqn{i} belongs to decile
 \eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}. 
 
-\code{'invvol'} is the inverse volatility portfolio.
-
 Default: \code{type = 'mv'}.
 
 \item \code{constraint} constraint used for the optimization, among
-\code{'none'}, \code{'lo'} and \code{'gross'} where: \code{'none'} is used to 
-compute the unconstraint portfolio, \code{'lo'} is the long-only constraint and 
-\code{'gross'} is the gross constraint. Default: \code{constraint = 'none'}. 
+\code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to 
+compute the unconstraint portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),  
+\code{'gross'} is the gross exposure constraint, and \code{'user'} is the set of user constraints (typically
+lower and upper boundaries. Default: \code{constraint = 'none'}. Note that the 
+summability constraint is always imposed.
+
+\item \code{LB} lower boundary for the weights. Default: \code{LB = NULL}. 
+
+\item \code{UB} lower boundary for the weights. Default: \code{UB = NULL}. 
+
+\item \code{w0} starting value for the optimizer. Default: \code{w0 = NULL} takes the 
+equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it it set to 
+mid-point of the bounds.
 
 \item \code{gross.c} gross exposure constraint. Default: \code{gross.c = 1.6}. 
 
-\item \code{gamma} Risk aversion parameter. Default: \code{gamma = 0.89}.
+\item \code{gamma} risk aversion parameter. Default: \code{gamma = 0.89}.
+
+\item \code{ctr.slsqp} list with control parameters for slsqp function.
 }
-}
-\note{
-The long-only and the gross constraints are implemented for \code{'mv'}, \code{'minvol'} and 
-\code{'maxdiv'} portfolios.
 }
 \examples{
 # Load returns of assets or portfolios
@@ -92,71 +100,96 @@ semiDev = semidevEstimation(rets)
 optimalPortfolio(mu = mu, Sigma = Sigma)
 
 # Mean-variance portfolio without constraint and gamma = 1
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(gamma = 1))
+optimalPortfolio(mu = mu, Sigma = Sigma, 
+  control = list(gamma = 1))
 
 # Mean-variance portfolio with without and gamma = 0.89
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv'))
+optimalPortfolio(mu = mu, Sigma = Sigma, 
+  control = list(type = 'mv'))
 
 # Mean-variance portfolio without constraint and gamma = 0.89
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
-    constraint = 'none'))
+optimalPortfolio(mu = mu, Sigma = Sigma, 
+  control = list(type = 'mv', constraint = 'none'))
 
 # Mean-variance portfolio with the long-only constraint and gamma = 0.89
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
-    constraint = 'lo'))
+optimalPortfolio(mu = mu, Sigma = Sigma, 
+  control = list(type = 'mv', constraint = 'lo'))
+
+# Mean-variance portfolio with LB and UB constraints
+optimalPortfolio(mu = mu, Sigma = Sigma, 
+  control = list(type = 'mv', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 
 # Mean-variance portfolio with the gross constraint, 
 # gross constraint parameter = 1.6 and gamma = 0.89
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
-    constraint = 'gross'))
+optimalPortfolio(mu = mu, Sigma = Sigma, 
+  control = list(type = 'mv', constraint = 'gross'))
 
 # Mean-variance portfolio with the gross constraint, 
 # gross constraint parameter = 1.2 and gamma = 0.89
-optimalPortfolio(mu = mu, Sigma = Sigma, control = list(type = 'mv', 
-    constraint = 'gross', gross.c = 1.2))
+optimalPortfolio(mu = mu, Sigma = Sigma, 
+  control = list(type = 'mv', constraint = 'gross', gross.c = 1.2))
 
 # Minimum volatility portfolio without constraint
-optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol'))
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'minvol'))
 
 # Minimum volatility portfolio without constraint
-optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'none'))
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'minvol', constraint = 'none'))
 
 # Minimim volatility portfolio with the long-only constraint
-optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'lo'))
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'minvol', constraint = 'lo'))
+  
+# Minimim volatility portfolio with LB and UB constraints
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'minvol', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 
 # Minimum volatility portfolio with the gross constraint 
 # and the gross constraint parameter = 1.6
-optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'gross'))
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'minvol', constraint = 'gross'))
 
 # Minimum volatility portfolio with the gross constraint 
 # and the gross parameter = 1.2
-optimalPortfolio(Sigma = Sigma, control = list(type = 'minvol', constraint = 'gross', 
-    gross.c = 1.2))
-
-# Equal-risk-contribution portfolio without constraint
-optimalPortfolio(Sigma = Sigma, control = list(type = 'erc'))
-
-# Equal-risk-contribution portfolio without constraint
-optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'none'))
-
-# Equal-risk-contribution portfolio with the long-only constraint
-optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'lo'))
-
-# Maximum diversification portfolio without constraint
-optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv'))
-
-# Maximum diversification portoflio with the long-only constraint
-optimalPortfolio(Sigma = Sigma, control = list(type = 'maxdiv', constraint = 'lo'))
-
-# Risk-efficient portfolio without constraint
-optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff'))
-
-# Risk-efficient portfolio with the long-only constraint
-optimalPortfolio(Sigma = Sigma, semiDev = semiDev, control = list(type = 'riskeff', 
-    constraint = 'lo'))
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'minvol', constraint = 'gross', gross.c = 1.2))
     
 # Inverse volatility portfolio
-optimalPortfolio(Sigma = Sigma, control = list(type = 'invvol'))
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'invvol'))
+
+# Equal-risk-contribution portfolio with the long-only constraint
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'erc', constraint = 'lo'))
+  
+# Equal-risk-contribution portfolio with LB and UB constraints
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'erc', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
+
+# Maximum diversification portfolio without constraint
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'maxdiv'))
+
+# Maximum diversification portoflio with the long-only constraint
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'maxdiv', constraint = 'lo'))
+  
+# Maximum diversification portoflio with LB and UB constraints
+optimalPortfolio(Sigma = Sigma, 
+  control = list(type = 'maxdiv', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
+
+# Risk-efficient portfolio without constraint
+optimalPortfolio(Sigma = Sigma, semiDev = semiDev, 
+  control = list(type = 'riskeff'))
+
+# Risk-efficient portfolio with the long-only constraint
+optimalPortfolio(Sigma = Sigma, semiDev = semiDev, 
+  control = list(type = 'riskeff', constraint = 'lo'))
+  
+# Risk-efficient portfolio with LB and UB constraints
+optimalPortfolio(Sigma = Sigma, semiDev = semiDev, 
+  control = list(type = 'riskeff', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 }
 \author{
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.

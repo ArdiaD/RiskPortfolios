@@ -1,4 +1,4 @@
-{
+﻿{
   "@context": "https://raw.githubusercontent.com/mbjones/codemeta/master/codemeta.jsonld",
   "@type": "Code",
   "author": [
@@ -27,11 +27,11 @@
   "identifier": null,
   "codeRepository": "https://github.com/ArdiaD/RiskPortfolios",
   "datePublished": "2017-01-08",
-  "dateModified": "2017-01-08",
+  "dateModified": "2017-01-10",
   "dateCreated": "2017-01-08",
   "description": "Risk-based portfolios in R",
   "keywords": "R software, portolios, optimization, risk-based",
   "license": "GPL",
   "title": "RiskPortfolios",
-  "version": "v2.00.07"
+  "version": "v2.00.10"
 }

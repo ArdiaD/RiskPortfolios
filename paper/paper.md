@@ -1,11 +1,17 @@
 ---
 title: 'RiskPortfolios: Computation of Risk-Based Portfolios in R'
 bibliography: paper.bib
-date: "22 December 2016"
+date: "10 January 2017"
 tags:
 - risk
 - portfolio
 - optimization
+- mean-variance
+- minimum variance
+- inverse-volatility
+- equal-risk-contribution
+- maximum diversification
+- risk-efficient
 authors:
 - affiliation: Institute of Financial Analysis - University of Neuchâtel
   name: David Ardia

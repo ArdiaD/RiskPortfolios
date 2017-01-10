@@ -1,10 +1,16 @@
 ---
 title: 'RiskPortfolios: Computation of Risk-Based Portfolios in R'
-date: "09 January 2017"
+date: "10 January 2017"
 tags:
 - risk
 - portfolio
 - optimization
+- mean-variance
+- minimum variance
+- inverse-volatility
+- equal-risk-contribution
+- maximum diversification
+- risk-efficient
 authors:
 - affiliation: Institute of Financial Analysis - University of Neuchâtel
   name: David Ardia
@@ -16,6 +22,13 @@ authors:
   name: Jean-Philippe Gagnon-Fleury
   orcid: null
 ---
+
+# Introduction
+RiskPortfolios is an R package for constructing risk-based portfolios. It provides
+a set of functionalities to build mean-variance, minimum variance, inverse-volatility weighted, 
+equal-risk-contribution, maximum diversification, and risk-efficient portfolios. As risk-based portfolios are
+mainly based on covariances, the package also provides a large set of covariance matrix estimators.
+
 
 # Installation
 To install the package, run the following commands in R:
