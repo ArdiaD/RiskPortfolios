@@ -6,7 +6,8 @@
 \alias{RiskPortfolios-package}
 \title{RiskPortfolios}
 \description{
-\code{RiskPortfolios} is an \R package for constructing risk-based portfolios. It provides a set of 
+\code{RiskPortfolios} is an \R package for constructing risk-based portfolios dedicated to 
+portfolio managers and quantitative analysts. It provides a set of 
 functionalities to build mean-variance, minimum variance, inverse-volatility weighted (Leote et al., 2012), 
 equal-risk-contribution (Maillard et al. 2010), maximum diversification (Choueifaty and Coignard, 2008), and 
 risk-efficient (Amenc et al., 2011) portfolios. Optimization is achieved with the \R 
@@ -36,9 +37,13 @@ Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
 Efficient indexation: An alternatice to cap-weightes indices.  
 \emph{Journal of Investment Management} \bold{9}(4), pp.1--23.
 
+Ardia, D., Boudt, K. (2015). 
+Implied expected returns and the choice of a mean-variance efficient portfolio proxy.
+\emph{Journal of Portfolio Management} \bold{41}(4), pp.66--81. \doi{10.3905/jpm.2015.41.4.068}.
+
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
 The Impact of covariance misspecification in risk-based portfolios.  
-\emph{Working paper}. URL \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
+\emph{Working paper}. \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
 
 Choueifaty, Y., Coignard, Y. (2008).  
 Toward maximum diversification.
@@ -66,6 +71,6 @@ The properties of equally weighted risk contribution portfolios.
 
 Martellini, L. (2008).  
 Towards the design of better equity benchmarks.
-\emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}
+\emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}.
 }
 

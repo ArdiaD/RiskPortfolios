@@ -46,18 +46,20 @@ variables. See Ledoit and Wolf (2003).
 
 \code{'const'} is a weighted average of the sample covariance matrix and a
 'prior' or 'shrinkage target'.  The prior is given by constant correlation
-matrix.
+matrix. See Ledoit, O., Wolf, M. (2002).
 
 \code{'cor'} is a weighted average of the sample covariance matrix and a
 'prior' or 'shrinkage target'.  The prior is given by the constant
-correlation covariance matrix given by Ledoit and Wolf (2003)
+correlation covariance matrix given by Ledoit and Wolf (2003).
 
 \code{'oneparm'} is a weighted average of the sample covariance matrix and a
 'prior' or 'shrinkage target'.  The prior is given by the one-parameter
-matrix. All variances are the same and all covariances are zero.
+matrix. All variances are the same and all covariances are zero. 
+See Ledoit, O., Wolf, M. (2004).
 
 \code{'diag'} is a weighted average of the sample covariance matrix and a
-'prior' or 'shrinkage target'.  The prior is given by a diagonal matrix.
+'prior' or 'shrinkage target'.  The prior is given by a diagonal matrix. 
+See Ledoit, O., Wolf, M. (2002).
 
 \code{'large'} This estimator is a weighted average of the sample covariance
 matrix and a 'prior' or 'shrinkage target'. Here, the prior is given by a
@@ -67,7 +69,8 @@ minimize quadratic loss measured by the Frobenius norm. The estimator is
 valid as the number of variables and/or the number of observations go to
 infinity, but Monte-Carlo simulations show that it works well for values as
 low as 10. The main advantage is that this estimator is guaranteed to be
-invertible and well-conditioned even if variables outnumber observations.
+invertible and well-conditioned even if variables outnumber observations. 
+See Ledoit, O., Wolf, M. (2004).
 
 \code{'bs'} is the Bayes-Stein estimator for the covariance matrix given by
 Jorion (1986).
@@ -80,7 +83,7 @@ Default: \code{type = 'naive'}.
 chosen to estimate the covariance matrix. Default: \code{K = 1}.}
 }
 \note{
-Part of the code is inspired from the Matlab code by Ledoit and Wolf.
+Part of the code is adapted from the Matlab code by Ledoit and Wolf (2014).
 }
 \examples{
 # Load returns of assets or portfolios
@@ -129,6 +132,10 @@ Herold, U., Maurer, R. (2006).
 Portfolio choice and estimation risk. A comparison of Bayesian to heuristic approaches. 
 \emph{Astin bulletin} \bold{36}(1), pp.135--160. \doi{10.1017/S0515036100014434}.
 
+Jorion, P. (1986). 
+Bayes-Stein estimation for portfolio analysis.
+\emph{Journal of Financial and Quantitative Analysis} \bold{21}(3), pp.279--292. \doi{10.2307/2331042}.
+
 Ledoit, O., Wolf, M. (2002).  
 Improved estimation of the covariance matrix of stock returns with an application to portfolio selection. 
 \emph{Journal of Empirical Finance} \bold{10}(5), pp.603--621. \doi{10.1016/S0927-5398(03)00007-0}.
@@ -139,7 +146,7 @@ Honey, I Shrunk the Sample Covariance Matrix.
 
 Ledoit, O., Wolf, M. (2004).  
 A well-conditioned estimator for large-dimensional covariance matrices.
-\emph{Journal of Multivariate Analysis} \bold{88}, pp.365--411. \doi{10.1016/S0047-259X(03)00096-4}.
+\emph{Journal of Multivariate Analysis} \bold{88}(2), pp.365--411. \doi{10.1016/S0047-259X(03)00096-4}.
 }
 \keyword{htest}
 

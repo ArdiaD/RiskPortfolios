@@ -60,6 +60,8 @@ is one if the semi-deviation of stock \eqn{i} belongs to decile
 
 Default: \code{type = 'mv'}.
 
+These portfolios are summarized in Ardia and Boudt (2015) and Ardia et al. (2016). Below we list the various references.
+
 \item \code{constraint} constraint used for the optimization, among
 \code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to 
 compute the unconstraint portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),  
@@ -199,6 +201,10 @@ Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
 Efficient indexation: An alternatice to cap-weightes indices.  
 \emph{Journal of Investment Management} \bold{9}(4), pp.1--23.
 
+Ardia, D., Boudt, K. (2015). 
+Implied expected returns and the choice of a mean-variance efficient portfolio proxy.
+\emph{Journal of Portfolio Management} \bold{41}(4), pp.66--81. \doi{10.3905/jpm.2015.41.4.068}.
+
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
 The Impact of covariance misspecification in risk-based portfolios.  
 \emph{Working paper}. URL \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
@@ -229,7 +235,7 @@ The properties of equally weighted risk contribution portfolios.
 
 Martellini, L. (2008).  
 Towards the design of better equity benchmarks.
-\emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}
+\emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}.
 }
 \keyword{optimize}
 
