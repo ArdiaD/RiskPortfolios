@@ -8,6 +8,7 @@
 #' functions \code{\link[quadprog]{solve.QP}} and \code{\link[nloptr]{slsqp}}. Long or gross constraints can be added to the optimizer. 
 #' As risk-based portfolios are mainly based on covariances, the package also provides a large set of 
 #' covariance matrix estimators. A simulation study relying on the package is described in Ardia et al. 2016.
+#' 
 #' @section Functions:
 #' \itemize{
 #' \item \code{\link{optimalPortfolio}}: Optimization of portfolios.
@@ -24,9 +25,13 @@
 #' Efficient indexation: An alternatice to cap-weightes indices.  
 #' \emph{Journal of Investment Management} \bold{9}(4), pp.1--23.
 #' 
+#' Ardia, D., Boudt, K. (2015). 
+#' Implied expected returns and the choice of a mean-variance efficient portfolio proxy.
+#' \emph{Journal of Portfolio Management} \bold{41}(4), pp.66--81. \doi{10.3905/jpm.2015.41.4.068}.
+#' 
 #' Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
 #' The Impact of covariance misspecification in risk-based portfolios.  
-#' \emph{Working paper}. URL \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
+#' \emph{Working paper}. \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
 #' 
 #' Choueifaty, Y., Coignard, Y. (2008).  
 #' Toward maximum diversification.
@@ -54,5 +59,5 @@
 #' 
 #' Martellini, L. (2008).  
 #' Towards the design of better equity benchmarks.
-#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}
+#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}.
 NULL

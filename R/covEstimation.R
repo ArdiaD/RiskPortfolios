@@ -30,18 +30,20 @@
 #' 
 #' \code{'const'} is a weighted average of the sample covariance matrix and a
 #' 'prior' or 'shrinkage target'.  The prior is given by constant correlation
-#' matrix.
+#' matrix. See Ledoit, O., Wolf, M. (2002).
 #' 
 #' \code{'cor'} is a weighted average of the sample covariance matrix and a
 #' 'prior' or 'shrinkage target'.  The prior is given by the constant
-#' correlation covariance matrix given by Ledoit and Wolf (2003)
+#' correlation covariance matrix given by Ledoit and Wolf (2003).
 #' 
 #' \code{'oneparm'} is a weighted average of the sample covariance matrix and a
 #' 'prior' or 'shrinkage target'.  The prior is given by the one-parameter
-#' matrix. All variances are the same and all covariances are zero.
+#' matrix. All variances are the same and all covariances are zero. 
+#' See Ledoit, O., Wolf, M. (2004).
 #' 
 #' \code{'diag'} is a weighted average of the sample covariance matrix and a
-#' 'prior' or 'shrinkage target'.  The prior is given by a diagonal matrix.
+#' 'prior' or 'shrinkage target'.  The prior is given by a diagonal matrix. 
+#' See Ledoit, O., Wolf, M. (2002).
 #' 
 #' \code{'large'} This estimator is a weighted average of the sample covariance
 #' matrix and a 'prior' or 'shrinkage target'. Here, the prior is given by a
@@ -51,7 +53,8 @@
 #' valid as the number of variables and/or the number of observations go to
 #' infinity, but Monte-Carlo simulations show that it works well for values as
 #' low as 10. The main advantage is that this estimator is guaranteed to be
-#' invertible and well-conditioned even if variables outnumber observations.
+#' invertible and well-conditioned even if variables outnumber observations. 
+#' See Ledoit, O., Wolf, M. (2004).
 #' 
 #' \code{'bs'} is the Bayes-Stein estimator for the covariance matrix given by
 #' Jorion (1986).
@@ -66,12 +69,16 @@
 #' @param rets a matrix \eqn{(T \times N)}{(T x N)} of returns.
 #' @param control control parameters (see *Details*).
 #' @return A \eqn{(N \times N)}{(N x N)} covariance matrix.
-#' @note Part of the code is inspired from the Matlab code by Ledoit and Wolf.
+#' @note Part of the code is adapted from the Matlab code by Ledoit and Wolf (2014).
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @references 
 #' Herold, U., Maurer, R. (2006).  
 #' Portfolio choice and estimation risk. A comparison of Bayesian to heuristic approaches. 
 #' \emph{Astin bulletin} \bold{36}(1), pp.135--160. \doi{10.1017/S0515036100014434}.
+#' 
+#' Jorion, P. (1986). 
+#' Bayes-Stein estimation for portfolio analysis.
+#' \emph{Journal of Financial and Quantitative Analysis} \bold{21}(3), pp.279--292. \doi{10.2307/2331042}.
 #' 
 #' Ledoit, O., Wolf, M. (2002).  
 #' Improved estimation of the covariance matrix of stock returns with an application to portfolio selection. 
@@ -83,7 +90,7 @@
 #' 
 #' Ledoit, O., Wolf, M. (2004).  
 #' A well-conditioned estimator for large-dimensional covariance matrices.
-#' \emph{Journal of Multivariate Analysis} \bold{88}, pp.365--411. \doi{10.1016/S0047-259X(03)00096-4}.
+#' \emph{Journal of Multivariate Analysis} \bold{88}(2), pp.365--411. \doi{10.1016/S0047-259X(03)00096-4}.
 #' @keywords htest
 #' @examples
 #' # Load returns of assets or portfolios
@@ -294,6 +301,7 @@ covEstimation <- function(rets, control = list()) {
   ## Shrinkage of the covariance matrix towards market INPUTs rets :
   ## matrix (T x N) returns OUTPUTs Sigma : matrix (N x N) covariance
   ## matrix
+  ## Adapted from covMarket.m by Olivier Ledoit and Michael Wolf (2014)
   lwCovElement <- .lwCovElement(rets, type = "lw")
   
   t <- lwCovElement$t
@@ -384,6 +392,7 @@ covEstimation <- function(rets, control = list()) {
   ## Shrinkage of the covariance matrix towards constant correlation
   ## matrix by Ledoit-Wolf INPUTs rets : matrix (T x N) returns OUTPUTs
   ## Sigma : matrix (N x N) covariance matrix
+  ## Adapted from covCor.m by Olivier Ledoit and Michael Wolf (2014)
   lwCovElement <- .lwCovElement(rets, type = "cor")
   
   t <- lwCovElement$t
@@ -469,6 +478,7 @@ covEstimation <- function(rets, control = list()) {
 .oneparmCov <- function(rets) {
   ## Shrinks towards one-parameter matrix INPUTs rets : matrix (T x N)
   ## returns OUTPUTs Sigma : matrix (N x N) covariance matrix
+  ## Adapted from cov1para.m by Olivier Ledoit and Michael Wolf (2014)
   lwCovElement <- .lwCovElement(rets, type = "oneparm")
   
   t <- lwCovElement$t
@@ -523,8 +533,8 @@ covEstimation <- function(rets, control = list()) {
   
   tau <- t * phi/(1 - phi)
   
-  Sigma <- Sigma * (1 + 1/(t + tau)) + tau/(t * (t + 1 + tau)) * outer(i, 
-                                                                       i)/as.numeric(crossprod(i, invSigmai))
+  Sigma <- Sigma * (1 + 1/(t + tau)) + 
+    tau/(t * (t + 1 + tau)) * outer(i, i)/as.numeric(crossprod(i, invSigmai))
   
   return(Sigma)
 }

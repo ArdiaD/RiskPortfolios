@@ -15,7 +15,7 @@
 #' 
 #' \code{'bs'} is used to compute the Bayes-Stein estimation.
 #' 
-#' \code{'mart'} is used to compute the Martinelli implied returns.
+#' \code{'mart'} is used to compute the Martinelli (2008) implied returns.
 #' 
 #' Default: \code{type = 'naive'}.
 #' 
@@ -30,6 +30,10 @@
 #' Jorion, P. (2004).  
 #' Bayes-Stein estimation for portfolio analysis. 
 #' \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3), pp.279--292. \doi{10.2307/2331042}.
+#' 
+#' Martellini, L. (2008).  
+#' Towards the design of better equity benchmarks.
+#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}.
 #' @keywords htest
 #' @examples
 #' # Load returns of assets or portfolios
