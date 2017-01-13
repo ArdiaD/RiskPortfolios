@@ -14,8 +14,7 @@ Imports:
     MASS,
     quadprog,
     nloptr
-Description: RiskPortfolios is a collection of functions designed to compute
-    risk-based portfolios.
+Description: Collection of functions designed to compute risk-based portfolios.
 License: GPL (>=2)
 RoxygenNote: 5.0.1
 Suggests: testthat
