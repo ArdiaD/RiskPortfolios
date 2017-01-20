@@ -11,9 +11,9 @@
 #' \code{'naive'} is used to compute the arithmetic mean of the returns.
 #' 
 #' \code{'ewma'} is used to compute the exponential weighted moving average
-#' mean of the returns.  The data must be sorted from the oldest to the latest.
+#' mean of the returns. The data must be sorted from the oldest to the latest. See RiskMetrics (1996).
 #' 
-#' \code{'bs'} is used to compute the Bayes-Stein estimation.
+#' \code{'bs'} is used to compute the Bayes-Stein estimation. See Jorion (1986).
 #' 
 #' \code{'mart'} is used to compute the Martinelli (2008) implied returns.
 #' 
@@ -27,13 +27,20 @@
 #' @return A \eqn{(N \times 1)}{(N x 1)} vector of expected returns.
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @references 
-#' Jorion, P. (2004).  
+#' Jorion, P. (1986).  
 #' Bayes-Stein estimation for portfolio analysis. 
-#' \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3), pp.279--292. \doi{10.2307/2331042}.
+#' \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3), pp.279--292. 
+#' \doi{10.2307/2331042}
 #' 
 #' Martellini, L. (2008).  
 #' Towards the design of better equity benchmarks.
-#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}.
+#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. 
+#' \doi{10.3905/jpm.2008.709978}
+#' 
+#' RiskMetrics (1996)
+#' \emph{RiskMetrics Technical Document}.
+#' J. P. Morgan/Reuters. 
+#' \url{https://www.msci.com/documents/10199/5915b101-4206-4ba0-aee2-3449d5c7e95a}
 #' @keywords htest
 #' @examples
 #' # Load returns of assets or portfolios

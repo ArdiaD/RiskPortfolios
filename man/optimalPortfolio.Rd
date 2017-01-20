@@ -12,7 +12,7 @@ optimalPortfolio(Sigma, mu = NULL, semiDev = NULL, control = list())
 \item{mu}{a \eqn{(N \times 1)}{(N x 1)} vector of expected returns. Default:
 \code{mu = NULL}.}
 
-\item{semiDev}{a vector \eqn{(N \times 1)}{(N x 1)} of semideviation.
+\item{semiDev}{a vector \eqn{(N \times 1)}{(N x 1)} of semideviations.
 Default: \code{semiDev = NULL}.}
 
 \item{control}{control parameters (see *Details*).}
@@ -74,7 +74,7 @@ summability constraint is always imposed.
 \item \code{UB} lower boundary for the weights. Default: \code{UB = NULL}. 
 
 \item \code{w0} starting value for the optimizer. Default: \code{w0 = NULL} takes the 
-equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it it set to 
+equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it is set to 
 mid-point of the bounds.
 
 \item \code{gross.c} gross exposure constraint. Default: \code{gross.c = 1.6}. 
@@ -105,7 +105,7 @@ optimalPortfolio(mu = mu, Sigma = Sigma)
 optimalPortfolio(mu = mu, Sigma = Sigma, 
   control = list(gamma = 1))
 
-# Mean-variance portfolio with without and gamma = 0.89
+# Mean-variance portfolio without constraint and gamma = 0.89
 optimalPortfolio(mu = mu, Sigma = Sigma, 
   control = list(type = 'mv'))
 
@@ -203,39 +203,48 @@ Efficient indexation: An alternatice to cap-weightes indices.
 
 Ardia, D., Boudt, K. (2015). 
 Implied expected returns and the choice of a mean-variance efficient portfolio proxy.
-\emph{Journal of Portfolio Management} \bold{41}(4), pp.66--81. \doi{10.3905/jpm.2015.41.4.068}.
+\emph{Journal of Portfolio Management} \bold{41}(4), pp.66--81. 
+\doi{10.3905/jpm.2015.41.4.068}
 
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
-The Impact of covariance misspecification in risk-based portfolios.  
-\emph{Working paper}. URL \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
+\emph{The Impact of covariance misspecification in risk-based portfolios}.  
+Working paper. 
+\url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
 
 Choueifaty, Y., Coignard, Y. (2008).  
 Toward maximum diversification.
-\emph{Journal of Portfolio Management} \bold{35}(1), pp.40--51. \doi{10.3905/JPM.2008.35.1.40}.
+\emph{Journal of Portfolio Management} \bold{35}(1), pp.40--51. 
+\doi{10.3905/JPM.2008.35.1.40}
 
 Choueifaty, Y., Froidure, T., Reynier, J. (2013).  
 Properties of the most diversified portfolio.  
-\emph{Journal of Investment Strategies} \bold{2}(2), pp.49--70. \doi{10.21314/JOIS.2013.033}.
+\emph{Journal of Investment Strategies} \bold{2}(2), pp.49--70. 
+\doi{10.21314/JOIS.2013.033}
 
 Das, S., Markowitz, H., Scheid, J., Statman, M. (2010).  
 Portfolio optimization with mental accounts.  
-\emph{Journal of Financial and Quantitative Analysis} \bold{45}(2), pp.311--334. \doi{10.1017/S0022109010000141}.
+\emph{Journal of Financial and Quantitative Analysis} \bold{45}(2), pp.311--334. 
+\doi{10.1017/S0022109010000141}
 
 DeMiguel, V., Garlappi, L., Uppal, R. (2009).  
 Optimal versus naive diversification: How inefficient is the 1/n portfolio strategy.  
-\emph{Review of Financial Studies} \bold{22}(5), pp.1915--1953. \doi{10.1093/rfs/hhm075}.
+\emph{Review of Financial Studies} \bold{22}(5), pp.1915--1953. 
+\doi{10.1093/rfs/hhm075}
 
 Fan, J., Zhang, J., Yu, K. (2009).  
-Asset allocation and risk assessment with gross exposure constraints for vast portfolios.
-\emph{Working paper}. \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1307423}.
+\emph{Asset allocation and risk assessment with gross exposure constraints for vast portfolios}.
+Working paper. 
+\url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1307423}
 
 Maillard, S., Roncalli, T., Teiletche, J. (2010).  
 The properties of equally weighted risk contribution portfolios.  
-\emph{Journal of Portfolio Management} \bold{36}(4), pp.60--70. \doi{10.3905/jpm.2010.36.4.060}.
+\emph{Journal of Portfolio Management} \bold{36}(4), pp.60--70. 
+\doi{10.3905/jpm.2010.36.4.060}
 
 Martellini, L. (2008).  
 Towards the design of better equity benchmarks.
-\emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. \doi{10.3905/jpm.2008.709978}.
+\emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34--41. 
+\doi{10.3905/jpm.2008.709978}
 }
 \keyword{optimize}
 

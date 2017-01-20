@@ -28,13 +28,13 @@ vector, among \code{'naive'} and \code{'ewma'} where:
 \code{'naive'} is used to compute the simple semideviation.
 
 \code{'ewma'} is used to compute the exponential weighted moving average
-semideviation. The data must be sorted from the oldest to the latest.
+semideviation. The data must be sorted from the oldest to the latest. See RiskMetrics (1996).
 
 The semideviation for one stock is computed as follows. First we select the
 returns which are smaller than the average of the past returns; we get a new
-vector of dimension \eqn{K \times 1, K \le N}. Then, the weight \eqn{w_i}
+vector of dimension \eqn{K \times 1, K \le N}{Kx1,K<=N}. Then, the weight \eqn{w_i}{w_i}
 for each observation at its corresponding time \eqn{t} is computed as \eqn{w
-= \lambda^{t}}. We obtain a \eqn{K \times 1}{Kx1} vector. The vector of
+= \lambda^{t}}{w=lambda^t}. We obtain a \eqn{K \times 1}{Kx1} vector. The vector of
 weights is then normalized.  Finally, the semideviation is obtained as the
 weighted standard deviation.
 
@@ -62,6 +62,12 @@ semidevEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 }
 \author{
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
+}
+\references{
+RiskMetrics (1996)
+\emph{RiskMetrics Technical Document}.
+J. P. Morgan/Reuters. 
+\url{https://www.msci.com/documents/10199/5915b101-4206-4ba0-aee2-3449d5c7e95a}
 }
 \keyword{htest}
 

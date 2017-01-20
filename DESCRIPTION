@@ -1,6 +1,6 @@
 Package: RiskPortfolios
-Version: 2.00.11
-Date: 2017-01-10
+Version: 2.00.12
+Date: 2017-01-20
 Title: Computation of Risk-Based Portfolios
 Authors@R: c(person("David", "Ardia", role = c("aut", "cre"),
                      email = "david.ardia.ch@gmail.com"),

@@ -27,17 +27,17 @@ covariance matrix, among \code{'naive'}, \code{'ewma'}, \code{'lw'},
 \code{'diag'} and \code{'large'} where: 
 
 \code{'naive'} is used to compute 
-the naive covariance matrix. 
+the naive (standard) covariance matrix. 
 
 \code{'ewma'} is used to compute the exponential weighting moving average covariance matrix. The following formula is used 
-to compute de ewma covariance matrix:
+to compute the ewma covariance matrix:
 \deqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda)r_{t-1}r_{t-1}}{Sigma[t]
 := lambda * Sigma[t-1] + (1-lambda) r[t-1]'r[t-1]}
 where \eqn{r_t} is the \eqn{(N \times 1)}{(N x 1)} vector of returns at time
-\eqn{t}. Note that the data must be sorted from the oldest to the latest.
+\eqn{t}. Note that the data must be sorted from the oldest to the latest. See RiskMetrics (1996)
 
 \code{'factor'} is used to compute the covariance matrix estimation using a
-K-factor approach.
+K-factor approach. See Harman (1976).
 
 \code{'lw'} is a weighted average of the sample covariance matrix and a
 'prior' or 'shrinkage target'. The prior is given by a one-factor model and
@@ -46,7 +46,7 @@ variables. See Ledoit and Wolf (2003).
 
 \code{'const'} is a weighted average of the sample covariance matrix and a
 'prior' or 'shrinkage target'.  The prior is given by constant correlation
-matrix. See Ledoit, O., Wolf, M. (2002).
+matrix. See Ledoit and Wolf (2002).
 
 \code{'cor'} is a weighted average of the sample covariance matrix and a
 'prior' or 'shrinkage target'.  The prior is given by the constant
@@ -55,11 +55,11 @@ correlation covariance matrix given by Ledoit and Wolf (2003).
 \code{'oneparm'} is a weighted average of the sample covariance matrix and a
 'prior' or 'shrinkage target'.  The prior is given by the one-parameter
 matrix. All variances are the same and all covariances are zero. 
-See Ledoit, O., Wolf, M. (2004).
+See Ledoit and Wolf (2004).
 
 \code{'diag'} is a weighted average of the sample covariance matrix and a
 'prior' or 'shrinkage target'.  The prior is given by a diagonal matrix. 
-See Ledoit, O., Wolf, M. (2002).
+See Ledoit and Wolf (2002).
 
 \code{'large'} This estimator is a weighted average of the sample covariance
 matrix and a 'prior' or 'shrinkage target'. Here, the prior is given by a
@@ -70,7 +70,7 @@ valid as the number of variables and/or the number of observations go to
 infinity, but Monte-Carlo simulations show that it works well for values as
 low as 10. The main advantage is that this estimator is guaranteed to be
 invertible and well-conditioned even if variables outnumber observations. 
-See Ledoit, O., Wolf, M. (2004).
+See Ledoit and Wolf (2004).
 
 \code{'bs'} is the Bayes-Stein estimator for the covariance matrix given by
 Jorion (1986).
@@ -128,25 +128,34 @@ covEstimation(rets, control = list(type = 'large'))
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 }
 \references{
-Herold, U., Maurer, R. (2006).  
-Portfolio choice and estimation risk. A comparison of Bayesian to heuristic approaches. 
-\emph{Astin bulletin} \bold{36}(1), pp.135--160. \doi{10.1017/S0515036100014434}.
-
 Jorion, P. (1986). 
 Bayes-Stein estimation for portfolio analysis.
-\emph{Journal of Financial and Quantitative Analysis} \bold{21}(3), pp.279--292. \doi{10.2307/2331042}.
+\emph{Journal of Financial and Quantitative Analysis} \bold{21}(3), pp.279--292. 
+\doi{10.2307/2331042}
+
+Harman, H.H. (1976)
+\emph{Modern Factor Analysis}. 
+3rd Ed. Chicago: University of Chicago Press.
 
 Ledoit, O., Wolf, M. (2002).  
 Improved estimation of the covariance matrix of stock returns with an application to portfolio selection. 
-\emph{Journal of Empirical Finance} \bold{10}(5), pp.603--621. \doi{10.1016/S0927-5398(03)00007-0}.
+\emph{Journal of Empirical Finance} \bold{10}(5), pp.603--621. 
+\doi{10.1016/S0927-5398(03)00007-0}
 
 Ledoit, O., Wolf, M. (2003).  
 Honey, I Shrunk the Sample Covariance Matrix.
-\emph{Journal of Portfolio Management} \bold{30}(4), pp.110--119. \doi{10.3905/jpm.2004.110}.
+\emph{Journal of Portfolio Management} \bold{30}(4), pp.110--119. 
+\doi{10.3905/jpm.2004.110}
 
 Ledoit, O., Wolf, M. (2004).  
 A well-conditioned estimator for large-dimensional covariance matrices.
-\emph{Journal of Multivariate Analysis} \bold{88}(2), pp.365--411. \doi{10.1016/S0047-259X(03)00096-4}.
+\emph{Journal of Multivariate Analysis} \bold{88}(2), pp.365--411. 
+\doi{10.1016/S0047-259X(03)00096-4}
+
+RiskMetrics (1996)
+\emph{RiskMetrics Technical Document}.
+J. P. Morgan/Reuters. 
+\url{https://www.msci.com/documents/10199/5915b101-4206-4ba0-aee2-3449d5c7e95a}
 }
 \keyword{htest}
 
