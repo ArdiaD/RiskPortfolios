@@ -4,9 +4,9 @@
 \name{RiskPortfolios}
 \alias{RiskPortfolios}
 \alias{RiskPortfolios-package}
-\title{RiskPortfolios}
+\title{RiskPortfolios: Computation of risk-based portfolios in R}
 \description{
-\code{RiskPortfolios} is an \R package for constructing risk-based portfolios dedicated to 
+\code{RiskPortfolios} (Ardia et al., 2017) is an \R package for constructing risk-based portfolios dedicated to 
 portfolio managers and quantitative analysts. It provides a set of 
 functionalities to build mean-variance, minimum variance, inverse-volatility weighted (Leote et al., 2012), 
 equal-risk-contribution (Maillard et al. 2010), maximum diversification (Choueifaty and Coignard, 2008), and 
@@ -14,6 +14,9 @@ risk-efficient (Amenc et al., 2011) portfolios. Optimization is achieved with th
 functions \code{\link[quadprog]{solve.QP}} and \code{\link[nloptr]{slsqp}}. Long or gross constraints can be added to the optimizer. 
 As risk-based portfolios are mainly based on covariances, the package also provides a large set of 
 covariance matrix estimators. A simulation study relying on the package is described in Ardia et al. (2016).
+}
+\note{
+Please cite the package in publications. Use \code{citation("RiskPortfolios")}.
 }
 \section{Functions}{
 
@@ -43,9 +46,14 @@ Implied expected returns and the choice of a mean-variance efficient portfolio p
 \doi{10.3905/jpm.2015.41.4.068}
 
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
-\emph{The Impact of covariance misspecification in risk-based portfolios}.  
+\emph{The impact of covariance misspecification in risk-based portfolios}.  
 Working paper. 
-\url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
+\doi{10.2139/ssrn.2650644}
+
+Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
+RiskPortfolios: Computation of risk-based portfolios in R.  
+\emph{Journal of Open Source Software} \bold{10}(2).
+\doi{10.21105/joss.00171}
 
 Choueifaty, Y., Coignard, Y. (2008).  
 Toward maximum diversification.

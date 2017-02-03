@@ -1,7 +1,7 @@
 #' @name RiskPortfolios
 #' @docType package
-#' @title RiskPortfolios
-#' @description \code{RiskPortfolios} is an \R package for constructing risk-based portfolios dedicated to 
+#' @title RiskPortfolios: Computation of risk-based portfolios in R
+#' @description \code{RiskPortfolios} (Ardia et al., 2017) is an \R package for constructing risk-based portfolios dedicated to 
 #' portfolio managers and quantitative analysts. It provides a set of 
 #' functionalities to build mean-variance, minimum variance, inverse-volatility weighted (Leote et al., 2012), 
 #' equal-risk-contribution (Maillard et al. 2010), maximum diversification (Choueifaty and Coignard, 2008), and 
@@ -21,6 +21,7 @@
 #' @section Update:
 #' The latest version of the package is available at \url{https://github.com/ArdiaD/RiskPortfolios}.
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon-Fleury.
+#' @note Please cite the package in publications. Use \code{citation("RiskPortfolios")}.
 #' @references 
 #' Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
 #' Efficient indexation: An alternatice to cap-weightes indices.  
@@ -32,9 +33,14 @@
 #' \doi{10.3905/jpm.2015.41.4.068}
 #' 
 #' Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
-#' \emph{The Impact of covariance misspecification in risk-based portfolios}.  
+#' \emph{The impact of covariance misspecification in risk-based portfolios}.  
 #' Working paper. 
-#' \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
+#' \doi{10.2139/ssrn.2650644}
+#' 
+#' Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
+#' RiskPortfolios: Computation of risk-based portfolios in R.  
+#' \emph{Journal of Open Source Software} \bold{10}(2).
+#' \doi{10.21105/joss.00171}
 #' 
 #' Choueifaty, Y., Coignard, Y. (2008).  
 #' Toward maximum diversification.

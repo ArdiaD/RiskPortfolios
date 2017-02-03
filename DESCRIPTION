@@ -1,6 +1,6 @@
 Package: RiskPortfolios
-Version: 2.00.11
-Date: 2017-01-28
+Version: 2.1.0
+Date: 2017-02-02
 Title: Computation of Risk-Based Portfolios
 Authors@R: c(person("David", "Ardia", role = c("aut", "cre"),
                      email = "david.ardia.ch@gmail.com"),
@@ -14,7 +14,10 @@ Imports:
     MASS,
     quadprog,
     nloptr
-Description: Collection of functions designed to compute risk-based portfolios.
+Description: Collection of functions designed to compute risk-based portfolios as described 
+    in Ardia et al. (2016) <doi:10.2139/ssrn.2650644> and Ardia et al. (2017) <doi:10.21105/joss.00171>.
 License: GPL (>=2)
+BugReports: https://github.com/ArdiaD/RiskPortfolios/issues
+URL: https://github.com/ArdiaD/RiskPortfolios
 RoxygenNote: 5.0.1
 Suggests: testthat
