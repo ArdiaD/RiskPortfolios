@@ -1,6 +1,6 @@
 # RiskPortfolios
 
-`RiskPortfolios` is an R package for constructing risk-based portfolios dedicated to portfolio managers 
+`RiskPortfolios` (Ardia et al., 2017) is an R package for constructing risk-based portfolios dedicated to portfolio managers 
 and quantitative analysts. It provides a set of functionalities to build mean-variance, minimum variance, inverse-volatility weighted, 
 equal-risk-contribution, maximum diversification, and risk-efficient portfolios. As risk-based portfolios are
 mainly based on covariances, the package also provides a large set of covariance matrix estimators. See [Ardia et al. (2017)](http://dx.doi.org/10.21105/joss.00171) for details. A Monte Carlo study relying on `RiskPortfolios` is presented in [Ardia et al. (2016)](http://dx.doi.org/10.2139/ssrn.2650644).
@@ -19,9 +19,9 @@ Please cite `RiskPortfolios` in publications.
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
 _The impact of covariance misspecification in risk-based portfolios_.  
 Working paper. 
-<doi:10.2139/ssrn.2650644>
+http://dx.doi.org/10.2139/ssrn.2650644
 
 Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
 RiskPortfolios: Computation of risk-based portfolios in R.  
 _Journal of Open Source Software_ **10**(2).
-<doi:10.21105/joss.00171>
+http://dx.doi.org/10.21105/joss.00171
