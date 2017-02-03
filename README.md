@@ -38,7 +38,6 @@ The latest stable version of `RiskPortfolios` is available at 'https://cran.r-pr
 
 The latest development version of `RiskPortfolios` is available at 'https://github.com/ArdiaD/RiskPortfolios'.
 
-
 # Installation
 To install the latest stable version of `RiskPortfolios`, run the following commands in R:
 
