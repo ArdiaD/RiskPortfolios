@@ -13,16 +13,16 @@ mainly based on covariances, the package also provides a large set of covariance
 
 The latest stable version of `RiskPortfolios` is available at [https://cran.r-project.org/package=RiskPortfolios](https://cran.r-project.org/package=RiskPortfolios).
 
-The latest development version of `RiskPortfolios` is available at [https://github.com/ArdiaD/RiskPortfolio](https://github.com/ArdiaD/RiskPortfolio).
+The latest development version of `RiskPortfolios` is available at [https://github.com/ArdiaD/RiskPortfolios](https://github.com/ArdiaD/RiskPortfolios).
 
 Please cite `RiskPortfolios` in publications:
 
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).    
 _The impact of covariance misspecification in risk-based portfolios_.    
-Working paper.   
-[http://dx.doi.org/10.2139/ssrn.2650644](http://dx.doi.org/10.2139/ssrn.2650644)  
+Working paper.     
+[http://dx.doi.org/10.2139/ssrn.2650644](http://dx.doi.org/10.2139/ssrn.2650644)    
 
-Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).    
-RiskPortfolios: Computation of risk-based portfolios in R.    
-_Journal of Open Source Software_ **10**(2).
-[http://dx.doi.org/10.21105/joss.00171](http://dx.doi.org/10.21105/joss.00171)    
+Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).      
+RiskPortfolios: Computation of risk-based portfolios in R.      
+_Journal of Open Source Software_ **10**(2).  
+[http://dx.doi.org/10.21105/joss.00171](http://dx.doi.org/10.21105/joss.00171)      
