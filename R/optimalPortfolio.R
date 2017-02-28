@@ -485,7 +485,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     Sigmaw <- crossprod(Sigma, w)
     pRC <- (w * Sigmaw) / as.numeric(crossprod(w, Sigmaw))
     sig_p <- as.numeric(sqrt(crossprod(w, Sigmaw)))
-    f <- pRC - 1/N
+    f <- pRC - 1/n
     g <- 2 * (sig_p^2 * (crossprod(Sigma, (w * f)) + f * Sigmaw) - 2 * Sigmaw * as.numeric(crossprod(w * f, Sigmaw))) / sig_p^4
   }
   
