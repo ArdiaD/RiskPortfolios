@@ -383,8 +383,13 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
         as.numeric(crossprod(w, Sigmaw))
       return(opt)
     }
+    .gradmeanvar <- function(w)
+    {
+      g <- -mu + ctr$gamma[1] * crossprod(Sigma, w)
+    } 
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
-    w <- nloptr::slsqp(x0 = ctr$w0, fn = .meanvar, 
+    w <- nloptr::slsqp(x0 = ctr$w0, fn = .meanvar,
+                       gr = .gradmeanvar,
                        hin = ..grossContraint, 
                        heq = .eqConstraint, 
                        lower = ctr$LB,
@@ -424,9 +429,15 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
       Sigmaw <- crossprod(Sigma, w)
       v <- as.numeric(crossprod(w, Sigmaw))
       return(v)
-    }
+    }    
+    .gradminvol <- function(w)
+    {
+      Sigmaw <- crossprod(Sigma, w)
+      g <- Sigmaw / sqrt(as.numeric(crossprod(w, Sigmaw)))
+    }    
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
-    w <- nloptr::slsqp(x0 = ctr$w0, fn = .minvol, 
+    w <- nloptr::slsqp(x0 = ctr$w0, fn = .minvol,
+                       gr = .gradminvol,
                        hin = ..grossContraint, 
                        heq = .eqConstraint,
                        lower = ctr$LB,
@@ -469,12 +480,22 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     return(d)
   }
   
+  .gradERC <- function(w)
+  {
+    Sigmaw <- crossprod(Sigma, w)
+    pRC <- (w * Sigmaw) / as.numeric(crossprod(w, Sigmaw))
+    sig_p <- as.numeric(sqrt(crossprod(w, Sigmaw)))
+    f <- pRC - 1/N
+    g <- 2 * (sig_p^2 * (crossprod(Sigma, (w * f)) + f * Sigmaw) - 2 * Sigmaw * as.numeric(crossprod(w * f, Sigmaw))) / sig_p^4
+  }
+  
   ..grossContraint = NULL
   if (ctr$constraint[1] == "gross") {
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
   }
   
   w <- nloptr::slsqp(x0 = ctr$w0, fn = .pRC, 
+                     gr = .gradERC,
                      hin = ..grossContraint,
                      heq = .eqConstraint, 
                      lower = ctr$LB, 
@@ -501,12 +522,22 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     return(divRatio)
   }
   
+  .gradMaxDiv <- function(w)
+  {
+    Sigmaw <- crossprod(Sigma, w)
+    sig = sqrt(diag(Sigma))
+    sig_p <- as.numeric(sqrt(crossprod(w, Sigmaw)))
+    g <- (sig_p * sig - as.numeric(crossprod(w, sig)) * Sigmaw / sig_p) / sig_p^2
+    g <- - g
+  }
+  
   ..grossContraint = NULL
   if (ctr$constraint[1] == "gross") {
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
   }
   
   w <- nloptr::slsqp(x0 = ctr$w0, fn = .divRatio, 
+                     gr = .gradMaxDiv,
                      hin = ..grossContraint,
                      heq = .eqConstraint, 
                      lower = ctr$LB, 
@@ -560,12 +591,21 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     return(d)
   }
   
+  .gradRiskEff <- function(w)
+  {
+    Sigmaw <- crossprod(Sigma, w)
+    sig_p <- as.numeric(sqrt(crossprod(w, Sigmaw)))
+    g <- (sig_p * Jepsilon - as.numeric(crossprod(w, Jepsilon)) * Sigmaw / sig_p) / sig_p^2
+    g <- - g
+  }
+  
   ..grossContraint = NULL
   if (ctr$constraint[1] == "gross") {
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
   }
   
-  w <- nloptr::slsqp(x0 = ctr$w0, fn = .distRiskEff, 
+  w <- nloptr::slsqp(x0 = ctr$w0, fn = .distRiskEff,
+                     gr = .gradRiskEff,
                      hin = ..grossContraint,
                      heq = .eqConstraint, 
                      lower = LB, 
