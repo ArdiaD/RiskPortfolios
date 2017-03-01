@@ -208,12 +208,6 @@ optimalPortfolio(Sigma = Sigma,
 # Maximum decorrelation portoflio with LB and UB constraints
 optimalPortfolio(Sigma = Sigma, 
   control = list(type = 'maxdec', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
-<<<<<<< HEAD
-=======
-}
-\author{
-David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
->>>>>>> 84a07584ce65982ce7095a1ea62c69cac42c7992
 }
 \references{
 Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
