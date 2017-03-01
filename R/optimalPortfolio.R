@@ -37,8 +37,8 @@
 #' \eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}. 
 #' 
 #' \code{'maxdec'} is used to compute the weights of the maximum-decorrelation
-#' portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' \Sigma w}
-#' \right\} }{w = argmax { 1- \sqrt(w' R w)} where \eqn{R} is the correlation matrix. 
+#' portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' \Sigma w} \right\}
+#' }{w = argmax {1- \sqrt(w' R w)}} where \eqn{R} is the correlation matrix. 
 #' 
 #' Default: \code{type = 'mv'}.
 #' 
