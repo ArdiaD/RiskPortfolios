@@ -256,6 +256,8 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     w <- .riskeffPortfolio(Sigma = Sigma, semiDev = semiDev, control = control)
   } else if (ctr$type[1] == "invvol") {
     w <- .invvolPortfolio(Sigma = Sigma, control = control)
+  } else if (ctr$type[1] == "maxdec") {
+    w <- .maxdecPortfolio(Sigma = Sigma, control = control)
   } else {
     stop("control$type is not well defined")
   }
@@ -277,7 +279,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   }
   nam <- names(control)
   ## type
-  type <- c("mv", "minvol", "erc", "maxdiv", "riskeff", "invvol")
+  type <- c("mv", "minvol", "erc", "maxdiv", "riskeff", "invvol", "maxdec")
   if (!("type" %in% nam) || is.null(control$type)) {
     control$type <- type
   }
@@ -613,6 +615,54 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
                      upper = UB, 
                      nl.info = FALSE, control = ctr$ctr.slsqp)$par
   
+  w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
+  w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
+  w <- w / sum(w)
+  return(w)
+}
+
+.maxdecPortfolio <- function(Sigma, control = list()) {
+  ## Compute the weight of the maximum decorrelation portfolio INPUTs Sigma :
+  ## matrix (N x N) covariance matrix control : list of control parameters
+  ## OUTPUTs w : vector (N x 1) weight
+  n <- dim(Sigma)[1]
+  ctr <- .ctrPortfolio(n, control)
+  Rho <- cov2cor(Sigma) 
+  if (ctr$constraint[1] == "none") {
+    tmp <- solve(Sigma, rep(1, n))
+    w <- tmp/sum(tmp)
+  } else if (ctr$constraint[1] == "lo" || ctr$constraint[1] == "user") {
+    dvec <- rep(0, n)
+    Amat <- cbind(rep(1, n), diag(n))
+    bvec <- c(1, ctr$LB)
+    if (ctr$constraint[1] == "user") {
+      Amat <- cbind(Amat, -diag(n))
+      bvec <- c(bvec, -ctr$UB)
+    }
+    w <- quadprog::solve.QP(Dmat = Rho, dvec = dvec, Amat = Amat, 
+                            bvec = bvec, meq = 1)$solution
+  } else if (ctr$constraint[1] == "gross") {
+    .maxdec <- function(w) {
+      Rhow <- crossprod(Rho, w)
+      v <- as.numeric(crossprod(w, Rhow)) # equivalent to: v <- sqrt(as.numeric(crossprod(w, Rhow)))
+      return(v)
+    }    
+    .gradmaxdec <- function(w)
+    {
+      Rhow <- crossprod(Rho, w)
+      g <- 2 * Rhow
+    }    
+    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    w <- nloptr::slsqp(x0 = ctr$w0, fn = .maxdec,
+                       gr = .gradmaxdec,
+                       hin = ..grossContraint, 
+                       heq = .eqConstraint,
+                       lower = ctr$LB,
+                       upper = ctr$UB,
+                       nl.info = FALSE,  control = ctr$ctr.slsqp)$par
+  } else {
+    # spotted in controls
+  }
   w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
   w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
   w <- w / sum(w)

@@ -149,4 +149,20 @@ test_that("Portfolios", {
   expect_equal(length(w), N)
   expect_true(f.test.pos(w))
   expect_true(f.test.sum(w))
+  
+  w = optimalPortfolio(Sigma = Sigma, 
+                       control = list(type = 'maxdec'))
+  expect_equal(length(w), N)
+  expect_true(f.test.sum(w))
+  
+  w = optimalPortfolio(Sigma = Sigma, 
+                       control = list(type = 'maxdec', constraint = 'lo'))
+  expect_equal(length(w), N)
+  expect_true(f.test.pos(w))
+  expect_true(f.test.sum(w))
+  
+  w = optimalPortfolio(Sigma = Sigma, 
+                       control = list(type = 'maxdec', constraint = 'user', LB = LB, UB = UB))
+  expect_equal(length(w), N)
+  expect_true(f.test.sum(w))
 })
