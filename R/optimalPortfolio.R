@@ -36,6 +36,10 @@
 #' is one if the semi-deviation of stock \eqn{i} belongs to decile
 #' \eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}. 
 #' 
+#' \code{'maxdec'} is used to compute the weights of the maximum-decorrelation
+#' portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' \Sigma w}
+#' \right\} }{w = argmax { 1- \sqrt(w' R w)} where \eqn{R} is the correlation matrix. 
+#' 
 #' Default: \code{type = 'mv'}.
 #' 
 #' These portfolios are summarized in Ardia and Boudt (2015) and Ardia et al. (2016). Below we list the various references.
@@ -228,6 +232,18 @@
 #' # Risk-efficient portfolio with LB and UB constraints
 #' optimalPortfolio(Sigma = Sigma, semiDev = semiDev, 
 #'   control = list(type = 'riskeff', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
+#'   
+#' # Maximum decorrelation portfolio without constraint
+#' optimalPortfolio(Sigma = Sigma, 
+#'   control = list(type = 'maxdec'))
+#' 
+#' # Maximum decorrelation portoflio with the long-only constraint
+#' optimalPortfolio(Sigma = Sigma, 
+#'   control = list(type = 'maxdec', constraint = 'lo'))
+#'   
+#' # Maximum decorrelation portoflio with LB and UB constraints
+#' optimalPortfolio(Sigma = Sigma, 
+#'   control = list(type = 'maxdec', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 #' @export
 optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list()) {
   
