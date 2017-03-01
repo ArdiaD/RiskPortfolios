@@ -245,6 +245,7 @@
 #' optimalPortfolio(Sigma = Sigma, 
 #'   control = list(type = 'maxdec', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 #' @export
+#' @importFrom stats cov2cor
 optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list()) {
   
   if (missing(Sigma)) {
@@ -643,7 +644,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ## OUTPUTs w : vector (N x 1) weight
   n <- dim(Sigma)[1]
   ctr <- .ctrPortfolio(n, control)
-  Rho <- cov2cor(Sigma) 
+  Rho <- stats::cov2cor(Sigma) 
   if (ctr$constraint[1] == "none") {
     tmp <- solve(Sigma, rep(1, n))
     w <- tmp/sum(tmp)

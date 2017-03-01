@@ -18,4 +18,3 @@ A matrix containing daily returns of 10 industry portfolios for the year 2014.
 Data are available from Kenneth French's website.
 }
 \keyword{datasets}
-
