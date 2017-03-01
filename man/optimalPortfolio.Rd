@@ -29,7 +29,7 @@ components:
 \itemize{
 \item \code{type} method used to compute the
 optimal portfolio, among \code{'mv'}, \code{'minvol'}, \code{'invvol'},
-\code{'erc'}, \code{'maxdiv'} and \code{'riskeff'} where: 
+\code{'erc'}, \code{'maxdiv'}, \code{'riskeff'} and \code{'maxdec'} where: 
 
 \code{'mv'} is used to compute the weights of the mean-variance portfolio. The weights are
 computed following this equation: \deqn{w = \frac{1}{\gamma} \Sigma^{-1}
@@ -208,6 +208,12 @@ optimalPortfolio(Sigma = Sigma,
 # Maximum decorrelation portoflio with LB and UB constraints
 optimalPortfolio(Sigma = Sigma, 
   control = list(type = 'maxdec', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
+<<<<<<< HEAD
+=======
+}
+\author{
+David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
+>>>>>>> 84a07584ce65982ce7095a1ea62c69cac42c7992
 }
 \references{
 Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).

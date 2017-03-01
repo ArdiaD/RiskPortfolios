@@ -7,7 +7,7 @@
 #' \itemize{
 #' \item \code{type} method used to compute the
 #' optimal portfolio, among \code{'mv'}, \code{'minvol'}, \code{'invvol'},
-#' \code{'erc'}, \code{'maxdiv'} and \code{'riskeff'} where: 
+#' \code{'erc'}, \code{'maxdiv'}, \code{'riskeff'} and \code{'maxdec'} where: 
 #' 
 #' \code{'mv'} is used to compute the weights of the mean-variance portfolio. The weights are
 #' computed following this equation: \deqn{w = \frac{1}{\gamma} \Sigma^{-1}
