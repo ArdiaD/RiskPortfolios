@@ -433,7 +433,8 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     .gradminvol <- function(w)
     {
       Sigmaw <- crossprod(Sigma, w)
-      g <- Sigmaw / sqrt(as.numeric(crossprod(w, Sigmaw)))
+      g <- 2 * Sigmaw 
+#       g <- Sigmaw / sqrt(as.numeric(crossprod(w, Sigmaw)))
     }    
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
     w <- nloptr::slsqp(x0 = ctr$w0, fn = .minvol,
