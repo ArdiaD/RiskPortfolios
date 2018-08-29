@@ -15,7 +15,7 @@ Imports:
     quadprog,
     nloptr
 Description: Collection of functions designed to compute risk-based portfolios as described 
-    in Ardia et al. (2017) <doi:10.2139/10.21105/joss.00171> and Ardia et al. (2017) <doi:10.21105/joss.00171>.
+    in Ardia et al. (2017) <doi:10.1007/s10479-017-2474-7> and Ardia et al. (2017) <doi:10.21105/joss.00171>.
 License: GPL (>=2)
 BugReports: https://github.com/ArdiaD/RiskPortfolios/issues
 URL: https://github.com/ArdiaD/RiskPortfolios

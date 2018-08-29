@@ -87,7 +87,7 @@
 #' Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
 #' The Impact of covariance misspecification in risk-based portfolios.  
 #' \emph{Annals of Operations Research} \bold{254}(1-2), pp.1-16. 
-#' \doi{10.21105/joss.00171}
+#' \doi{10.1007/s10479-017-2474-7}
 #' 
 #' Choueifaty, Y., Coignard, Y. (2008).  
 #' Toward maximum diversification.
