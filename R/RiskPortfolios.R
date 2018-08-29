@@ -8,7 +8,7 @@
 #' risk-efficient (Amenc et al., 2011) portfolios. Optimization is achieved with the \R 
 #' functions \code{\link[quadprog]{solve.QP}} and \code{\link[nloptr]{slsqp}}. Long or gross constraints can be added to the optimizer. 
 #' As risk-based portfolios are mainly based on covariances, the package also provides a large set of 
-#' covariance matrix estimators. A simulation study relying on the package is described in Ardia et al. (2016).
+#' covariance matrix estimators. A simulation study relying on the package is described in Ardia et al. (2017).
 #' 
 #' @section Functions:
 #' \itemize{
@@ -32,10 +32,10 @@
 #' \emph{Journal of Portfolio Management} \bold{41}(4), pp.66-81. 
 #' \doi{10.3905/jpm.2015.41.4.068}
 #' 
-#' Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
-#' \emph{The impact of covariance misspecification in risk-based portfolios}.  
-#' Working paper. 
-#' \doi{10.2139/ssrn.2650644}
+#' Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
+#' The Impact of covariance misspecification in risk-based portfolios.  
+#' \emph{Annals of Operations Research} \bold{254}(1-2), pp.1-16. 
+#' \doi{10.21105/joss.00171}
 #' 
 #' Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
 #' RiskPortfolios: Computation of risk-based portfolios in R.  
@@ -62,10 +62,10 @@
 #' \emph{Review of Financial Studies} \bold{22}(5), pp.1915-1953. 
 #' \doi{10.1093/rfs/hhm075}
 #' 
-#' Fan, J., Zhang, J., Yu, K. (2009).  
-#' Asset allocation and risk assessment with gross exposure constraints for vast portfolios.
-#' \emph{Working paper}. 
-#' \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1307423}
+#' Fan, J., Zhang, J., Yu, K. (2012).  
+#' Vast portfolio selection with gross-exposure constraints.
+#' \emph{Journal of the American Statistical Association} \bold{107}(498), pp.592-606. 
+#' \url{10.1080/01621459.2012.68282}
 #' 
 #' Maillard, S., Roncalli, T., Teiletche, J. (2010).  
 #' The properties of equally weighted risk contribution portfolios.  
