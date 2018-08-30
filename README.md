@@ -68,7 +68,7 @@ Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017).
 The impact of covariance misspecification in risk-based portfolios.  
 _Annals of Operations Research_ **254**(1-2), pp 1-16.      
 [http://dx.doi.org/10.1007/s10479-017-2474-7](http://dx.doi.org/10.1007/s10479-017-2474-7)       
-[http://dx.doi.org/10.2139/ssrn.2650644 ](http://dx.doi.org/10.2139/ssrn.2650644)
+[http://dx.doi.org/10.2139/ssrn.2650644](http://dx.doi.org/10.2139/ssrn.2650644)
 
 Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).      
 RiskPortfolios: Computation of risk-based portfolios in R.        

@@ -64,7 +64,7 @@ portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' \Sigma w} \right\}
 
 Default: \code{type = 'mv'}.
 
-These portfolios are summarized in Ardia and Boudt (2015) and Ardia et al. (2016). Below we list the various references.
+These portfolios are summarized in Ardia and Boudt (2015) and Ardia et al. (2017). Below we list the various references.
 
 \item \code{constraint} constraint used for the optimization, among
 \code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to 
@@ -219,10 +219,10 @@ Implied expected returns and the choice of a mean-variance efficient portfolio p
 \emph{Journal of Portfolio Management} \bold{41}(4), pp.66-81. 
 \doi{10.3905/jpm.2015.41.4.068}
 
-Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2016).  
-\emph{The Impact of covariance misspecification in risk-based portfolios}.  
-Working paper. 
-\url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2650644}
+Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
+The Impact of covariance misspecification in risk-based portfolios.  
+\emph{Annals of Operations Research} \bold{254}(1-2), pp.1-16. 
+\doi{10.1007/s10479-017-2474-7}
 
 Choueifaty, Y., Coignard, Y. (2008).  
 Toward maximum diversification.
@@ -244,10 +244,10 @@ Optimal versus naive diversification: How inefficient is the 1/n portfolio strat
 \emph{Review of Financial Studies} \bold{22}(5), pp.1915-1953. 
 \doi{10.1093/rfs/hhm075}
 
-Fan, J., Zhang, J., Yu, K. (2009).  
-\emph{Asset allocation and risk assessment with gross exposure constraints for vast portfolios}.
-Working paper. 
-\url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1307423}
+Fan, J., Zhang, J., Yu, K. (2012).  
+Vast portfolio selection with gross-exposure constraints.
+\emph{Journal of the American Statistical Association} \bold{107}(498), pp.592-606. 
+\url{10.1080/01621459.2012.68282}
 
 Maillard, S., Roncalli, T., Teiletche, J. (2010).  
 The properties of equally weighted risk contribution portfolios.  
