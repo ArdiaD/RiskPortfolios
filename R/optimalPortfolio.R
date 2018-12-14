@@ -1,7 +1,7 @@
 #' @name optimalPortfolio
 #' @aliases optimalPortfolio
 #' @title Optimal portfolio
-#' @description Function wich computes the optimal portfolio's weights.
+#' @description Function which computes the optimal portfolio's weights.
 #' @details The argument \code{control} is a list that can supply any of the following
 #' components: 
 #' \itemize{
