@@ -20,8 +20,6 @@ Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017a).
 RiskPortfolios: Computation of risk-based portfolios in R.        
 _Journal of Open Source Software_, 10(2), 1.    
 [https://doi.org/10.21105/joss.00171](https://doi.org/10.21105/joss.00171)  
-    
-# Other reference
 
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017b).      
 The impact of covariance misspecification in risk-based portfolios.  
