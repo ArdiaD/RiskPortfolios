@@ -13,7 +13,7 @@ mainly based on covariances, the package also provides a large set of covariance
 By using `RiskPortfolios` you agree to the following rules: 
 
 1) You must cite [Ardia et al. (2017a)](https://doi.org/10.21105/joss.00171) in working papers and published papers that use `RiskPortfolios`.
-2) You must place the following URL in a footnote to help others find `RiskPortfolios`: https://CRAN.R-project.org/package=RiskPortfolios. 
+2) You must place the following URL in a footnote to help others find `RiskPortfolios`: [https://CRAN.R-project.org/package=RiskPortfolios](https://CRAN.R-project.org/package=RiskPortfolios). 
 3) You assume all risk for the use of `RiskPortfolios`.
 
 Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017a).      
