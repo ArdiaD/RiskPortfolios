@@ -6,20 +6,24 @@
 \alias{RiskPortfolios-package}
 \title{RiskPortfolios: Computation of risk-based portfolios in R}
 \description{
-\code{RiskPortfolios} (Ardia et al., 2017) is an \R package for constructing risk-based portfolios dedicated to 
+\code{RiskPortfolios} (Ardia et al., 2017a) is an \R package for constructing risk-based portfolios dedicated to 
 portfolio managers and quantitative analysts. It provides a set of 
 functionalities to build mean-variance, minimum variance, inverse-volatility weighted (Leote et al., 2012), 
 equal-risk-contribution (Maillard et al. 2010), maximum diversification (Choueifaty and Coignard, 2008), and 
 risk-efficient (Amenc et al., 2011) portfolios. Optimization is achieved with the \R 
 functions \code{\link[quadprog]{solve.QP}} and \code{\link[nloptr]{slsqp}}. Long or gross constraints can be added to the optimizer. 
 As risk-based portfolios are mainly based on covariances, the package also provides a large set of 
-covariance matrix estimators. A simulation study relying on the package is described in Ardia et al. (2017).
+covariance matrix estimators. A simulation study relying on the package is described in Ardia et al. (2017b).
 }
 \note{
-Please cite the package in publications. Use \code{citation("RiskPortfolios")}.
+By using \code{RiskPortfolios}  you agree to the following rules:
+\itemize{
+\item You must cite Ardia et al. (2017a) in working papers and published papers that use \code{RiskPortfolios}. Use \code{citation("RiskPortfolios")}.
+\item You must place the following URL in a footnote to help others find \code{RiskPortfolios}: \url{https://CRAN.R-project.org/package=RiskPortfolios}. 
+\item You assume all risk for the use of \code{RiskPortfolios}.
+}
 }
 \section{Functions}{
-
 \itemize{
 \item \code{\link{optimalPortfolio}}: Optimization of portfolios.
 \item \code{\link{meanEstimation}}: Computation of expected returns.
@@ -29,7 +33,6 @@ Please cite the package in publications. Use \code{citation("RiskPortfolios")}.
 }
 
 \section{Update}{
-
 The latest version of the package is available at \url{https://github.com/ArdiaD/RiskPortfolios}.
 }
 
@@ -43,15 +46,15 @@ Implied expected returns and the choice of a mean-variance efficient portfolio p
 \emph{Journal of Portfolio Management} \bold{41}(4), pp.66-81. 
 \doi{10.3905/jpm.2015.41.4.068}
 
-Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
-The Impact of covariance misspecification in risk-based portfolios.  
-\emph{Annals of Operations Research} \bold{254}(1-2), pp.1-16. 
-\doi{10.1007/s10479-017-2474-7}
-
-Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
+Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017a).  
 RiskPortfolios: Computation of risk-based portfolios in R.  
 \emph{Journal of Open Source Software} \bold{10}(2).
 \doi{10.21105/joss.00171}
+
+Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017b).  
+The Impact of covariance misspecification in risk-based portfolios.  
+\emph{Annals of Operations Research} \bold{254}(1-2), pp.1-16. 
+\doi{10.1007/s10479-017-2474-7}
 
 Choueifaty, Y., Coignard, Y. (2008).  
 Toward maximum diversification.
