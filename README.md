@@ -19,13 +19,13 @@ By using `RiskPortfolios` you agree to the following rules:
 
 Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).      
 RiskPortfolios: Computation of risk-based portfolios in R.        
-_Journal of Open Source Software_ **10**(2).    
+_Journal of Open Source Software_, 10(2), 1.    
 [https://doi.org/10.21105/joss.00171](https://doi.org/10.21105/joss.00171)  
     
 # Other reference
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017).      
 The impact of covariance misspecification in risk-based portfolios.  
-_Annals of Operations Research_ **254**(1-2), pp 1-16.      
+_Annals of Operations Research_, 254(1-2), 1-16.      
 [https://doi.org/10.1007/s10479-017-2474-7](https://doi.org/10.1007/s10479-017-2474-7)       
 [https://doi.org/10.2139/ssrn.2650644](https://doi.org/10.2139/ssrn.2650644)
 
