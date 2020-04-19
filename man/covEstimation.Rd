@@ -128,7 +128,6 @@ covEstimation(rets, control = list(type = 'large'))
 Jorion, P. (1986). 
 Bayes-Stein estimation for portfolio analysis.
 \emph{Journal of Financial and Quantitative Analysis} \bold{21}(3), pp.279-292. 
-\doi{10.2307/2331042}
 
 Harman, H.H. (1976)
 \emph{Modern Factor Analysis}. 
@@ -137,22 +136,18 @@ Harman, H.H. (1976)
 Ledoit, O., Wolf, M. (2002).  
 Improved estimation of the covariance matrix of stock returns with an application to portfolio selection. 
 \emph{Journal of Empirical Finance} \bold{10}(5), pp.603-621. 
-\doi{10.1016/S0927-5398(03)00007-0}
 
 Ledoit, O., Wolf, M. (2003).  
 Honey, I Shrunk the Sample Covariance Matrix.
 \emph{Journal of Portfolio Management} \bold{30}(4), pp.110-119. 
-\doi{10.3905/jpm.2004.110}
 
 Ledoit, O., Wolf, M. (2004).  
 A well-conditioned estimator for large-dimensional covariance matrices.
 \emph{Journal of Multivariate Analysis} \bold{88}(2), pp.365-411. 
-\doi{10.1016/S0047-259X(03)00096-4}
 
 RiskMetrics (1996)
 \emph{RiskMetrics Technical Document}.
 J. P. Morgan/Reuters. 
-\url{https://www.msci.com/documents/10199/5915b101-4206-4ba0-aee2-3449d5c7e95a}
 }
 \author{
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.

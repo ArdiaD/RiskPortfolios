@@ -227,37 +227,30 @@ The Impact of covariance misspecification in risk-based portfolios.
 Choueifaty, Y., Coignard, Y. (2008).  
 Toward maximum diversification.
 \emph{Journal of Portfolio Management} \bold{35}(1), pp.40-51. 
-\doi{10.3905/JPM.2008.35.1.40}
 
 Choueifaty, Y., Froidure, T., Reynier, J. (2013).  
 Properties of the most diversified portfolio.  
 \emph{Journal of Investment Strategies} \bold{2}(2), pp.49-70. 
-\doi{10.21314/JOIS.2013.033}
 
 Das, S., Markowitz, H., Scheid, J., Statman, M. (2010).  
 Portfolio optimization with mental accounts.  
 \emph{Journal of Financial and Quantitative Analysis} \bold{45}(2), pp.311-334. 
-\doi{10.1017/S0022109010000141}
 
 DeMiguel, V., Garlappi, L., Uppal, R. (2009).  
 Optimal versus naive diversification: How inefficient is the 1/n portfolio strategy.  
 \emph{Review of Financial Studies} \bold{22}(5), pp.1915-1953. 
-\doi{10.1093/rfs/hhm075}
 
 Fan, J., Zhang, J., Yu, K. (2012).  
 Vast portfolio selection with gross-exposure constraints.
 \emph{Journal of the American Statistical Association} \bold{107}(498), pp.592-606. 
-\url{10.1080/01621459.2012.68282}
 
 Maillard, S., Roncalli, T., Teiletche, J. (2010).  
 The properties of equally weighted risk contribution portfolios.  
 \emph{Journal of Portfolio Management} \bold{36}(4), pp.60-70. 
-\doi{10.3905/jpm.2010.36.4.060}
 
 Martellini, L. (2008).  
 Towards the design of better equity benchmarks.
 \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41. 
-\doi{10.3905/jpm.2008.709978}
 }
 \author{
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.

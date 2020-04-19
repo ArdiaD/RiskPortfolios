@@ -3,5 +3,5 @@
 ^Contributing.md$
 ^README CRAN.md$
 ^README.md$
-paper/
-bin/
+paper
+bin
