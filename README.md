@@ -1,4 +1,4 @@
-## RiskPortfolios
+# RiskPortfolios
 [![status](http://joss.theoj.org/papers/b52ded01411ff8f9f007b84a27e4d6d9/status.svg)](http://joss.theoj.org/papers/b52ded01411ff8f9f007b84a27e4d6d9)
 [![CRAN](http://www.r-pkg.org/badges/version/RiskPortfolios)](https://cran.r-project.org/package=RiskPortfolios) 
 [![Downloads](http://cranlogs.r-pkg.org/badges/RiskPortfolios?color=brightgreen)](http://www.r-pkg.org/pkg/RiskPortfolios)
