@@ -216,7 +216,8 @@ Efficient indexation: An alternatice to cap-weightes indices.
 
 Ardia, D., Boudt, K. (2015). 
 Implied expected returns and the choice of a mean-variance efficient portfolio proxy.
-\emph{Journal of Portfolio Management} \bold{41}(4), pp.66-81. 
+\emph{Journal of Portfolio Management} \bold{41}(4), pp.66-81.
+\doi{10.3905/jpm.2015.41.4.068} 
 
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
 The Impact of covariance misspecification in risk-based portfolios.  
