@@ -217,7 +217,6 @@ Efficient indexation: An alternatice to cap-weightes indices.
 Ardia, D., Boudt, K. (2015). 
 Implied expected returns and the choice of a mean-variance efficient portfolio proxy.
 \emph{Journal of Portfolio Management} \bold{41}(4), pp.66-81. 
-\doi{10.3905/jpm.2015.41.4.068}
 
 Ardia, D., Bolliger, G., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
 The Impact of covariance misspecification in risk-based portfolios.  
@@ -250,7 +249,7 @@ The properties of equally weighted risk contribution portfolios.
 
 Martellini, L. (2008).  
 Towards the design of better equity benchmarks.
-\emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41. 
+\emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41.
 }
 \author{
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.

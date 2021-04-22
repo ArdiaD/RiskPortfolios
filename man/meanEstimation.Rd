@@ -73,6 +73,7 @@ Towards the design of better equity benchmarks.
 RiskMetrics (1996)
 \emph{RiskMetrics Technical Document}.
 J. P. Morgan/Reuters. 
+\url{https://www.msci.com/documents/10199/5915b101-4206-4ba0-aee2-3449d5c7e95a}
 }
 \author{
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.

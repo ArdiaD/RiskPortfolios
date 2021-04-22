@@ -4,7 +4,9 @@
 \name{Industry_10}
 \alias{Industry_10}
 \title{Industry Portfolios}
-\format{A matrix (of size 252 x 10) containing daily returns of 10 industry portfolios.}
+\format{
+A matrix (of size 252 x 10) containing daily returns of 10 industry portfolios.
+}
 \source{
 \url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html}.
 }
