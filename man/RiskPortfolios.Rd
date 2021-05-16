@@ -34,7 +34,7 @@ The latest version of the package is available at \url{https://github.com/ArdiaD
 
 \references{
 Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
-Efficient indexation: An alternatice to cap-weightes indices.  
+Efficient indexation: An alternative to cap-weighted indices.  
 \emph{Journal of Investment Management} \bold{9}(4), pp.1-23.
 
 Ardia, D., Boudt, K. (2015). 
