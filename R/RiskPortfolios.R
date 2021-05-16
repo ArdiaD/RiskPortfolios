@@ -21,7 +21,10 @@
 #' @section Update:
 #' The latest version of the package is available at \url{https://github.com/ArdiaD/RiskPortfolios}.
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon-Fleury.
-#' @note Please cite the package in publications. Use \code{citation("RiskPortfolios")}.
+#' @note By using \code{RiskPortfolios} you agree to the following rules: (1) You must cite Ardia et al. (2017) in 
+#' working papers and published papers that use \code{RiskPortfolios} (use \code{citation("RiskPortfolios")}), (2) you 
+#' must place the URL \url{https://CRAN.R-project.org/package=RiskPortfolios} in a footnote to help 
+#' others find \code{RiskPortfolios}, and (3) you assume all risk for the use of \code{RiskPortfolios}.
 #' @references 
 #' Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
 #' Efficient indexation: An alternative to cap-weighted indices.  

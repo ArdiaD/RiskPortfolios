@@ -15,7 +15,10 @@ As risk-based portfolios are mainly based on covariances, the package also provi
 covariance matrix estimators. A simulation study relying on the package is described in Ardia et al. (2017).
 }
 \note{
-Please cite the package in publications. Use \code{citation("RiskPortfolios")}.
+By using \code{RiskPortfolios} you agree to the following rules: (1) You must cite Ardia et al. (2017) in 
+working papers and published papers that use \code{RiskPortfolios} (use \code{citation("RiskPortfolios")}), (2) you 
+must place the URL \url{https://CRAN.R-project.org/package=RiskPortfolios} in a footnote to help 
+others find \code{RiskPortfolios}, and (3) you assume all risk for the use of \code{RiskPortfolios}.
 }
 \section{Functions}{
 
