@@ -77,6 +77,11 @@ summability constraint is always imposed.
 
 \item \code{UB} lower boundary for the weights. Default: \code{UB = NULL}. 
 
+\item \code{loadings} and \code{max.loadings.exposure}. If \code{constraint} is set to \code{'user'},
+the constraints \code{loadings * w <= max.loadings.exposure} are added. \code{loadings} should be a matrix
+where every row corresponds to an additional constraint and every column corresponds to an asset. 
+\code{max.loadings.exposure} should be a vector which size is equals to the number of constraints in \code{loadings}.
+
 \item \code{w0} starting value for the optimizer. Default: \code{w0 = NULL} takes the 
 equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it is set to 
 mid-point of the bounds.

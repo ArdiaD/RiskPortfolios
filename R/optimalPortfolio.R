@@ -54,6 +54,11 @@
 #' \item \code{LB} lower boundary for the weights. Default: \code{LB = NULL}. 
 #' 
 #' \item \code{UB} lower boundary for the weights. Default: \code{UB = NULL}. 
+#'
+#' \item \code{loadings} and \code{max.loadings.exposure}. If \code{constraint} is set to \code{'user'},
+#' the constraints \code{loadings * w <= max.loadings.exposure} are added. \code{loadings} should be a matrix
+#' where every row corresponds to an additional constraint and every column corresponds to an asset.
+#' \code{max.loadings.exposure} should be a vector which size is equals to the number of constraints in \code{loadings}.
 #' 
 #' \item \code{w0} starting value for the optimizer. Default: \code{w0 = NULL} takes the 
 #' equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it is set to 
@@ -335,11 +340,27 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     control$LB <- rep(0, n)
   }
   
+  ## maximum loadings exposure constraint
+  if(!("loadings" %in% nam) || is.null(control$loadings)) {
+    control$loadings <- matrix(nrow=0, ncol=n)
+  }
+  if(!("max.loadings.exposure" %in% nam) || is.null(control$max.loadings.exposure)) {
+    control$max.loadings.exposure = vector()
+  }
+  if( nrow(control$loadings)!=length(control$max.loadings.exposure) || ncol(control$loadings) != n) {
+    stop("'loadings' and 'max.loadings.exposure' are not properly defined.")
+  }
+
   ## starting portfolio
   if (!("w0" %in% nam) || is.null(control$w0)) {
     control$w0 <- rep(1, n) / n
     if (!is.null(control$LB) && !is.null(control$UB)) {
       control$w0 = 0.5 * (control$LB + control$UB)
+    }
+    if (control$type %in% c("erc", "maxdiv", "riskeff") && max(abs(control$w0)) < 1e-18) {
+      # if control$LB - control$UB == 0, we can get an error, because
+      # some optimization problems do not allow zero as w0
+      control$w0 <- rep(1, n) / n
     }
   }
   if (length(control$w0) != n) {
@@ -380,8 +401,8 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     w <- (1/ctr$gamma[1]) * invSigmamu/sum(invSigmamu) 
   } else if (ctr$constraint[1] == "lo" || ctr$constraint[1] == "user") {
     Dmat <- ctr$gamma[1] * Sigma
-    Amat <- cbind(rep(1, n), diag(n))
-    bvec <- c(1, ctr$LB)
+    Amat <- cbind(rep(1, n), diag(n), -t(ctr$loadings))
+    bvec <- c(1, ctr$LB, -ctr$max.loadings.exposure)
     if (ctr$constraint[1] == "user") {
       Amat <- cbind(Amat, -diag(n))
       bvec <- c(bvec, -ctr$UB)
@@ -399,14 +420,15 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     {
       g <- -mu + ctr$gamma[1] * crossprod(Sigma, w)
     } 
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    ..exposureConstraint = function(w) .grossConstraint(w, ctr$gross.c)
     w <- nloptr::slsqp(x0 = ctr$w0, fn = .meanvar,
                        gr = .gradmeanvar,
-                       hin = ..grossContraint, 
+                       hin = ..exposureConstraint, 
                        heq = .eqConstraint, 
                        lower = ctr$LB,
                        upper = ctr$UB,
-                       nl.info = FALSE, control = ctr$ctr.slsqp)$par
+                       nl.info = FALSE, control = ctr$ctr.slsqp,
+                       deprecatedBehavior=FALSE)$par
   } else {
     # spotted in controls
   }
@@ -431,8 +453,8 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     Amat <- cbind(rep(1, n), diag(n))
     bvec <- c(1, ctr$LB)
     if (ctr$constraint[1] == "user") {
-      Amat <- cbind(Amat, -diag(n))
-      bvec <- c(bvec, -ctr$UB)
+      Amat <- cbind(Amat, -diag(n), -t(ctr$loadings))
+      bvec <- c(bvec, -ctr$UB, -ctr$max.loadings.exposure)
     }
     w <- quadprog::solve.QP(Dmat = Sigma, dvec = dvec, Amat = Amat, 
                             bvec = bvec, meq = 1)$solution
@@ -448,14 +470,15 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
       g <- 2 * Sigmaw 
 #       g <- Sigmaw / sqrt(as.numeric(crossprod(w, Sigmaw)))
     }    
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    ..exposureConstraint = function(w) .grossConstraint(w, ctr$gross.c)
     w <- nloptr::slsqp(x0 = ctr$w0, fn = .minvol,
                        gr = .gradminvol,
-                       hin = ..grossContraint, 
+                       hin = ..exposureConstraint, 
                        heq = .eqConstraint,
                        lower = ctr$LB,
                        upper = ctr$UB,
-                       nl.info = FALSE,  control = ctr$ctr.slsqp)$par
+                       nl.info = FALSE,  control = ctr$ctr.slsqp,
+                       deprecatedBehavior=FALSE)$par
   } else {
     # spotted in controls
   }
@@ -502,18 +525,21 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     g <- 2 * (sig_p^2 * (crossprod(Sigma, (w * f)) + f * Sigmaw) - 2 * Sigmaw * as.numeric(crossprod(w * f, Sigmaw))) / sig_p^4
   }
   
-  ..grossContraint = NULL
+  ..exposureConstraint = NULL
   if (ctr$constraint[1] == "gross") {
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    ..exposureConstraint = function(w) .grossConstraint(w, ctr$gross.c)
+  } else if (ctr$constraint[1] == "user") {
+  	..exposureConstraint = .exposureConstraint(ctr)
   }
   
   w <- nloptr::slsqp(x0 = ctr$w0, fn = .pRC, 
                      gr = .gradERC,
-                     hin = ..grossContraint,
+                     hin = ..exposureConstraint,
                      heq = .eqConstraint, 
                      lower = ctr$LB, 
                      upper = ctr$UB, 
-                     nl.info = FALSE, control = ctr$ctr.slsqp)$par
+                     nl.info = FALSE, control = ctr$ctr.slsqp,
+                     deprecatedBehavior=FALSE)$par
   
   w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
   w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
@@ -544,18 +570,21 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     g <- - g
   }
   
-  ..grossContraint = NULL
+  ..exposureConstraint = NULL
   if (ctr$constraint[1] == "gross") {
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    ..exposureConstraint = function(w) .grossConstraint(w, ctr$gross.c)
+  } else if (ctr$constraint[1] == "user") {
+  	..exposureConstraint = .exposureConstraint(ctr)
   }
   
   w <- nloptr::slsqp(x0 = ctr$w0, fn = .divRatio, 
                      gr = .gradMaxDiv,
-                     hin = ..grossContraint,
+                     hin = ..exposureConstraint,
                      heq = .eqConstraint, 
                      lower = ctr$LB, 
                      upper = ctr$UB, 
-                     nl.info = FALSE, control = ctr$ctr.slsqp)$par
+                     nl.info = FALSE, control = ctr$ctr.slsqp,
+                     deprecatedBehavior=FALSE)$par
   
   w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
   w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
@@ -612,18 +641,21 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     g <- - g
   }
   
-  ..grossContraint = NULL
+  ..exposureConstraint = NULL
   if (ctr$constraint[1] == "gross") {
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    ..exposureConstraint = function(w) .grossConstraint(w, ctr$gross.c)
+  } else if (ctr$constraint[1] == "user") {
+  	..exposureConstraint = .exposureConstraint(ctr)
   }
   
   w <- nloptr::slsqp(x0 = ctr$w0, fn = .distRiskEff,
                      gr = .gradRiskEff,
-                     hin = ..grossContraint,
+                     hin = ..exposureConstraint,
                      heq = .eqConstraint, 
                      lower = LB, 
                      upper = UB, 
-                     nl.info = FALSE, control = ctr$ctr.slsqp)$par
+                     nl.info = FALSE, control = ctr$ctr.slsqp,
+                     deprecatedBehavior=FALSE)$par
   
   w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
   w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
@@ -646,8 +678,8 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     Amat <- cbind(rep(1, n), diag(n))
     bvec <- c(1, ctr$LB)
     if (ctr$constraint[1] == "user") {
-      Amat <- cbind(Amat, -diag(n))
-      bvec <- c(bvec, -ctr$UB)
+      Amat <- cbind(Amat, -diag(n), -t(ctr$loadings))
+      bvec <- c(bvec, -ctr$UB, -ctr$max.loadings.exposure)
     }
     w <- quadprog::solve.QP(Dmat = Rho, dvec = dvec, Amat = Amat, 
                             bvec = bvec, meq = 1)$solution
@@ -662,14 +694,15 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
       Rhow <- crossprod(Rho, w)
       g <- 2 * Rhow
     }    
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+    ..exposureConstraint = function(w) .grossConstraint(w, ctr$gross.c)
     w <- nloptr::slsqp(x0 = ctr$w0, fn = .maxdec,
                        gr = .gradmaxdec,
-                       hin = ..grossContraint, 
+                       hin = ..exposureConstraint, 
                        heq = .eqConstraint,
                        lower = ctr$LB,
                        upper = ctr$UB,
-                       nl.info = FALSE,  control = ctr$ctr.slsqp)$par
+                       nl.info = FALSE,  control = ctr$ctr.slsqp,
+                       deprecatedBehavior=FALSE)$par
   } else {
     # spotted in controls
   }
@@ -686,5 +719,11 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
 
 # DA here 1.6 is hard-coded, this should be changed
 .grossConstraint <- function(w, gross.c) {
-  return(gross.c - norm(as.matrix(w), type = "1"))
+  return(norm(as.matrix(w), type = "1") - gross.c)
+}
+
+.exposureConstraint <- function(ctr) {
+  function(w) {
+    ctr$loadings %*% w - ctr$max.loadings.exposure
+  }
 }
