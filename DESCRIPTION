@@ -18,4 +18,4 @@ NeedsCompilation: no
 Author: David Ardia [aut, cre, cph] (<https://orcid.org/0000-0003-2823-782X>),
   Kris Boudt [aut],
   Jean-Philippe Gagnon-Fleury [aut]
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2
