@@ -14,12 +14,13 @@
 #' mean of the returns. The data must be sorted from the oldest to the latest. See RiskMetrics (1996).
 #' 
 #' \code{'bs'} is used to compute the Bayes-Stein estimation. See Jorion (1986).
-#' 
-#' \code{'mart'} is used to compute the Martinelli (2008) implied returns.
-#' 
+#'
+#' \code{'mart'} is used to compute the Martellini (2008) implied returns.
+#'
 #' Default: \code{type = 'naive'}.
-#' 
-#' \item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
+#'
+#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+#' Default: \code{lambda = 0.94}.
 #' }
 #' 
 #' @param rets a \eqn{(T \times N)}{(T x N)} matrix of past returns.
@@ -27,9 +28,9 @@
 #' @return A \eqn{(N \times 1)}{(N x 1)} vector of expected returns.
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @references 
-#' Jorion, P. (1986).  
-#' Bayes-Stein estimation for portfolio analysis. 
-#' \emph{Journal of Finance and Quantitative Analysis} \bold{21}(3), pp.279-292. 
+#' Jorion, P. (1986).
+#' Bayes-Stein estimation for portfolio analysis.
+#' \emph{Journal of Financial and Quantitative Analysis} \bold{21}(3), pp.279-292.
 #' 
 #' Martellini, L. (2008).  
 #' Towards the design of better equity benchmarks.
@@ -56,7 +57,7 @@
 #' # Ewma estimation of the mean with lambda = 0.9
 #' meanEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 #' 
-#' # Martinelli's estimation of the mean
+#' # Martellini's estimation of the mean
 #' meanEstimation(rets, control = list(type = 'mart'))
 #' 
 #' # Bayes-Stein's estimation of the mean
@@ -95,16 +96,18 @@ meanEstimation <- function(rets, control = list()) {
   if (!is.list(control)) {
     stop("control must be a list")
   }
-  if (length(control) == 0) {
-    control <- list(type = "naive", lambda = 0.94)
-  }
   nam <- names(control)
+  type <- c("naive", "ewma", "bs", "mart")
   if (!("type" %in% nam) || is.null(control$type)) {
-    control$type <- c("naive", "ewma", "bs", "mart")
+    control$type <- type
+  }
+  if (!(control$type[1] %in% type)) {
+    stop("control$type is not well defined")
   }
   if (!("lambda" %in% nam) || is.null(control$lambda)) {
     control$lambda <- 0.94
   }
+  .checkLambda(control$lambda)
   return(control)
 }
 
@@ -130,27 +133,29 @@ meanEstimation <- function(rets, control = list()) {
 
 .bsMean <- function(rets) {
   ## Compute the Bayes-Stein mean INPUTs rets : matrix (T x N) returns
-  ## OUTPUTs mu : vector (N x 1) mean !!! TOFIX !!! estime pour l'instant
-  ## une matrice de var-cov de facon standard verifier avec david si on
-  ## laisse le choix en input
+  ## OUTPUTs mu : vector (N x 1) mean
+  ## The shrinkage intensity is phi = (N + 2) / ((N + 2) + T * Q) with
+  ## Q = (mu - mu_min)' Sigma^-1 (mu - mu_min), so T *must* be the number of
+  ## observations: taking it to be N would make the estimator independent of
+  ## the sample size and it would never converge to the sample mean.
   mu <- colMeans(rets)
   Sigma <- cov(rets)
   invSigma <- solve(Sigma)
-  N <- dim(Sigma)[1]
-  T <- length(mu)
+  N <- dim(rets)[2]
+  T <- dim(rets)[1]
   i <- rep(1, N)
   invSigmai <- crossprod(invSigma, i)
   w_min <- (invSigmai)/as.numeric(crossprod(i, invSigmai))
-  mu_min <- crossprod(mu, w_min)
+  mu_min <- as.numeric(crossprod(mu, w_min))
   invSigmaMu <- crossprod(invSigma, mu - mu_min)
-  phi <- (N + 2)/((N + 2) + T * crossprod(mu - mu_min, invSigmaMu))
+  phi <- (N + 2)/((N + 2) + T * as.numeric(crossprod(mu - mu_min, invSigmaMu)))
   phi <- max(min(phi, 1), 0)
   mu <- (1 - phi) * mu + phi * mu_min
   return(mu)
 }
 
 .martMean <- function(rets) {
-  ## Compute the Martinelli mean INPUTs rets : matrix (T x N) returns
+  ## Compute the Martellini mean INPUTs rets : matrix (T x N) returns
   ## OUTPUTs mu : vector (N x 1) mean
   mu <- apply(rets, 2, sd)
   return(mu)

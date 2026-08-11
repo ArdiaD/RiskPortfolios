@@ -1,5 +1,4 @@
 #' @name RiskPortfolios
-#' @docType package
 #' @title RiskPortfolios: Computation of risk-based portfolios in R
 #' @description \code{RiskPortfolios} (Ardia et al., 2017) is an \R package for constructing risk-based portfolios dedicated to 
 #' portfolio managers and quantitative analysts. It provides a set of 
@@ -69,7 +68,7 @@
 #' The properties of equally weighted risk contribution portfolios.  
 #' \emph{Journal of Portfolio Management} \bold{36}(4), pp.60-70. 
 #' 
-#' Martellini, L. (2008).  
+#' Martellini, L. (2008).
 #' Towards the design of better equity benchmarks.
-#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41. 
-NULL
+#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41.
+"_PACKAGE"

@@ -21,7 +21,7 @@ Default: \code{semiDev = NULL}.}
 A \eqn{(N \times 1)}{(N x 1)} vector of optimal portfolio weights.
 }
 \description{
-Function wich computes the optimal portfolio's weights.
+Function which computes the optimal portfolio's weights.
 }
 \details{
 The argument \code{control} is a list that can supply any of the following
@@ -31,21 +31,45 @@ components:
 optimal portfolio, among \code{'mv'}, \code{'minvol'}, \code{'invvol'},
 \code{'erc'}, \code{'maxdiv'}, \code{'riskeff'} and \code{'maxdec'} where: 
 
-\code{'mv'} is used to compute the weights of the mean-variance portfolio. The weights are
-computed following this equation: \deqn{w = \frac{1}{\gamma} \Sigma^{-1}
-\mu }{w = 1 / \gamma \Sigma^{-1} \mu}. 
+\code{'mv'} is used to compute the weights of the mean-variance portfolio, that
+is the solution of \deqn{\max_w \left\{ w' \mu - \frac{\gamma}{2} w' \Sigma w \right\}
+\quad s.t. \quad w'1 = 1}{max_w {w'mu - gamma/2 w'Sigma w} s.t. w'1 = 1}
+and, in the unconstrained case, is given in two-fund form by
+\deqn{w = \frac{\Sigma^{-1} 1}{1' \Sigma^{-1} 1} + \frac{1}{\gamma} \left( \Sigma^{-1} \mu -
+\frac{1' \Sigma^{-1} \mu}{1' \Sigma^{-1} 1} \Sigma^{-1} 1 \right)}{w = Sigma^-1 1 / (1'Sigma^-1 1)
++ 1/gamma (Sigma^-1 mu - (1'Sigma^-1 mu)/(1'Sigma^-1 1) Sigma^-1 1)}
+that is, the minimum-variance portfolio plus \eqn{1/\gamma}{1/gamma} times a
+self-financing speculative portfolio. Note that the summability constraint is
+imposed here as it is for the other portfolios, so the risk aversion
+\eqn{\gamma}{gamma} governs the tilt away from the minimum-variance portfolio
+rather than the leverage.
 
-\code{'minvol'} is used to compute the weights of the minimum variance portfolio.  
+\code{'minvol'} is used to compute the weights of the minimum variance portfolio.
 
-\code{'invvol'} is the inverse volatility portfolio.
+\code{'invvol'} is the inverse volatility portfolio. It is computed in closed
+form and is always long-only with weights summing to one, so the \code{'lo'}
+and \code{'gross'} constraints hold automatically. Bounds do not enter its
+definition: if \code{LB}/\code{UB} are supplied and bind, the weights are
+projected onto \eqn{\{LB \le w \le UB, w'1 = 1\}}{{LB <= w <= UB, w'1 = 1}}
+and a warning is issued.
 
-\code{'erc'} is used to compute the weights of the equal-risk-contribution portfolio. For a 
+\code{'erc'} is used to compute the weights of the equal-risk-contribution portfolio. For a
 portfolio \eqn{w}, the percentage volatility risk contribution of the i-th
-asset in the portfolio is given by: 
-\deqn{\% RC_i = \frac{ w_i {[\Sigma w]}_i}{w' \Sigma w} }{ RC_i = w_i[\Sigma w]_i / (w' \Sigma w)}. 
+asset in the portfolio is given by:
+\deqn{\% RC_i = \frac{ w_i {[\Sigma w]}_i}{w' \Sigma w} }{ RC_i = w_i[\Sigma w]_i / (w' \Sigma w)}.
 Then we compute the optimal portfolio by solving the following optimization problem:
 \deqn{w = argmin \left\{ \sum_{i=1}^N (\% RC_i - \frac{1}{N})^2 \right\}
 }{ argmin { \sum_{i=1}^{N} (RC_i - 1/N)^2} }.
+Without bounds, or under the long-only constraint, the solution is obtained
+exactly by solving \eqn{y_i [\Sigma y]_i = 1/N}{y[i] [Sigma y][i] = 1/N} for
+\eqn{y > 0}{y > 0} and rescaling to \eqn{w = y / (y'1)}{w = y / (y'1)}, which
+attains a zero objective. See Spinu (2013) and Chaves et al. (2012). This is
+necessary because the objective above is not convex and admits local minima on
+the boundary at which whole groups of assets receive a zero weight; a
+general-purpose optimizer started at the equally-weighted portfolio converges
+to them whenever the correlation matrix has sizeable negative entries. Under
+\code{'user'} or \code{'gross'} constraints the problem is solved numerically
+from several starting values.
 
 \code{'maxdiv'} is used to compute the weights of the maximum diversification portfolio where:
 \deqn{DR(w) = \frac{ w' \sigma}{\sqrt{w' \Sigma w} } \geq 1 }{ DR(w) = (w'
@@ -59,33 +83,48 @@ is one if the semi-deviation of stock \eqn{i} belongs to decile
 \eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}. 
 
 \code{'maxdec'} is used to compute the weights of the maximum-decorrelation
-portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' \Sigma w} \right\}
-}{w = argmax {1- \sqrt(w' R w)}} where \eqn{R} is the correlation matrix. 
+portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' R w} \right\}
+}{w = argmax {1- \sqrt(w' R w)}} where \eqn{R} is the correlation matrix.
 
 Default: \code{type = 'mv'}.
 
 These portfolios are summarized in Ardia and Boudt (2015) and Ardia et al. (2017). Below we list the various references.
 
 \item \code{constraint} constraint used for the optimization, among
-\code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to 
-compute the unconstraint portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),  
+\code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to
+compute the unconstraint portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),
 \code{'gross'} is the gross exposure constraint, and \code{'user'} is the set of user constraints (typically
-lower and upper boundaries. Default: \code{constraint = 'none'}. Note that the 
+lower and upper boundaries). Default: \code{constraint = 'none'}. Note that the
 summability constraint is always imposed.
 
-\item \code{LB} lower boundary for the weights. Default: \code{LB = NULL}. 
+\item \code{LB} lower boundary for the weights. Default: \code{LB = NULL}.
 
-\item \code{UB} lower boundary for the weights. Default: \code{UB = NULL}. 
+\item \code{UB} upper boundary for the weights. Default: \code{UB = NULL}.
 
-\item \code{w0} starting value for the optimizer. Default: \code{w0 = NULL} takes the 
-equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it is set to 
-mid-point of the bounds.
+\item \code{w0} starting value for the optimizer. Default: \code{w0 = NULL} takes the
+equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it is set to
+mid-point of the bounds. For the non-convex problems (\code{'erc'} under
+\code{'user'}/\code{'gross'} constraints, \code{'maxdiv'} and \code{'riskeff'})
+\code{w0} is one of several starting values that are tried, the best solution
+being returned.
 
-\item \code{gross.c} gross exposure constraint. Default: \code{gross.c = 1.6}. 
+\item \code{gross.c} gross exposure constraint, that is the bound imposed on
+\eqn{\|w\|_1}{||w||_1}. Since the weights sum to one, it cannot be smaller
+than one. Default: \code{gross.c = 1.6}.
 
-\item \code{gamma} risk aversion parameter. Default: \code{gamma = 0.89}.
+\item \code{gamma} risk aversion parameter, a single positive number.
+Default: \code{gamma = 0.89}.
 
-\item \code{ctr.slsqp} list with control parameters for slsqp function.
+\item \code{ctr.slsqp} list with control parameters for the
+\code{\link[nloptr]{slsqp}} function. Default:
+\code{list(xtol_rel = 1e-18, ftol_rel = 1e-12, check_derivatives = FALSE,
+maxeval = 2000)}. \code{xtol_rel} is below double precision and so cannot be
+met on its own; \code{ftol_rel} supplies an attainable stopping criterion, and
+the optimizer warns if it stops on \code{maxeval} instead of converging. Under
+the \code{'gross'} constraint, stopping on \code{ftol_rel} rather than
+exhausting the budget can leave up to about \eqn{2 \times 10^{-5}}{2e-5} of
+relative objective on the table; pass a smaller \code{ftol_rel} if that
+matters more than the runtime.
 }
 }
 \examples{
@@ -177,11 +216,11 @@ optimalPortfolio(Sigma = Sigma,
 optimalPortfolio(Sigma = Sigma, 
   control = list(type = 'maxdiv'))
 
-# Maximum diversification portoflio with the long-only constraint
+# Maximum diversification portfolio with the long-only constraint
 optimalPortfolio(Sigma = Sigma, 
   control = list(type = 'maxdiv', constraint = 'lo'))
   
-# Maximum diversification portoflio with LB and UB constraints
+# Maximum diversification portfolio with LB and UB constraints
 optimalPortfolio(Sigma = Sigma, 
   control = list(type = 'maxdiv', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 
@@ -201,17 +240,17 @@ optimalPortfolio(Sigma = Sigma, semiDev = semiDev,
 optimalPortfolio(Sigma = Sigma, 
   control = list(type = 'maxdec'))
 
-# Maximum decorrelation portoflio with the long-only constraint
+# Maximum decorrelation portfolio with the long-only constraint
 optimalPortfolio(Sigma = Sigma, 
   control = list(type = 'maxdec', constraint = 'lo'))
   
-# Maximum decorrelation portoflio with LB and UB constraints
+# Maximum decorrelation portfolio with LB and UB constraints
 optimalPortfolio(Sigma = Sigma, 
   control = list(type = 'maxdec', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 }
 \references{
 Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
-Efficient indexation: An alternatice to cap-weightes indices.  
+Efficient indexation: An alternative to cap-weighted indices.  
 \emph{Journal of Investment Management} \bold{9}(4), pp.1-23.
 
 Ardia, D., Boudt, K. (2015). 
@@ -224,13 +263,17 @@ The Impact of covariance misspecification in risk-based portfolios.
 \emph{Annals of Operations Research} \bold{254}(1-2), pp.1-16. 
 \doi{10.1007/s10479-017-2474-7}
 
-Choueifaty, Y., Coignard, Y. (2008).  
-Toward maximum diversification.
-\emph{Journal of Portfolio Management} \bold{35}(1), pp.40-51. 
+Chaves, D., Hsu, J., Li, F., Shakernia, O. (2012).
+Efficient algorithms for computing risk parity portfolio weights.
+\emph{Journal of Investing} \bold{21}(3), pp.150-163.
 
-Choueifaty, Y., Froidure, T., Reynier, J. (2013).  
-Properties of the most diversified portfolio.  
-\emph{Journal of Investment Strategies} \bold{2}(2), pp.49-70. 
+Choueifaty, Y., Coignard, Y. (2008).
+Toward maximum diversification.
+\emph{Journal of Portfolio Management} \bold{35}(1), pp.40-51.
+
+Choueifaty, Y., Froidure, T., Reynier, J. (2013).
+Properties of the most diversified portfolio.
+\emph{Journal of Investment Strategies} \bold{2}(2), pp.49-70.
 
 Das, S., Markowitz, H., Scheid, J., Statman, M. (2010).  
 Portfolio optimization with mental accounts.  
@@ -248,9 +291,14 @@ Maillard, S., Roncalli, T., Teiletche, J. (2010).
 The properties of equally weighted risk contribution portfolios.  
 \emph{Journal of Portfolio Management} \bold{36}(4), pp.60-70. 
 
-Martellini, L. (2008).  
+Martellini, L. (2008).
 Towards the design of better equity benchmarks.
 \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41.
+
+Spinu, F. (2013).
+An algorithm for computing risk parity weights.
+\emph{SSRN working paper}.
+\doi{10.2139/ssrn.2297383}
 }
 \author{
 David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.

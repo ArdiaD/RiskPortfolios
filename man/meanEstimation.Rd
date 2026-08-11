@@ -31,11 +31,12 @@ mean of the returns. The data must be sorted from the oldest to the latest. See 
 
 \code{'bs'} is used to compute the Bayes-Stein estimation. See Jorion (1986).
 
-\code{'mart'} is used to compute the Martinelli (2008) implied returns.
+\code{'mart'} is used to compute the Martellini (2008) implied returns.
 
 Default: \code{type = 'naive'}.
 
-\item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
+\item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+Default: \code{lambda = 0.94}.
 }
 }
 \examples{
@@ -55,16 +56,16 @@ meanEstimation(rets, control = list(type = 'ewma'))
 # Ewma estimation of the mean with lambda = 0.9
 meanEstimation(rets, control = list(type = 'ewma', lambda = 0.9))
 
-# Martinelli's estimation of the mean
+# Martellini's estimation of the mean
 meanEstimation(rets, control = list(type = 'mart'))
 
 # Bayes-Stein's estimation of the mean
 meanEstimation(rets, control = list(type = 'bs'))
 }
 \references{
-Jorion, P. (1986).  
-Bayes-Stein estimation for portfolio analysis. 
-\emph{Journal of Finance and Quantitative Analysis} \bold{21}(3), pp.279-292. 
+Jorion, P. (1986).
+Bayes-Stein estimation for portfolio analysis.
+\emph{Journal of Financial and Quantitative Analysis} \bold{21}(3), pp.279-292.
 
 Martellini, L. (2008).  
 Towards the design of better equity benchmarks.

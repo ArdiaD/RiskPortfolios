@@ -4,11 +4,12 @@ export(covEstimation)
 export(meanEstimation)
 export(optimalPortfolio)
 export(semidevEstimation)
-importFrom(stats,cor)
-importFrom(stats,cov)
-importFrom(stats,cov2cor)
-importFrom(stats,factanal)
-importFrom(stats,lm)
-importFrom(stats,median)
-importFrom(stats,quantile)
-importFrom(stats,sd)
+importFrom(stats,
+  cor,
+  cov,
+  cov2cor,
+  factanal,
+  median,
+  quantile,
+  sd
+)

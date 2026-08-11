@@ -2,6 +2,7 @@
 % Please edit documentation in R/RiskPortfolios.R
 \docType{package}
 \name{RiskPortfolios}
+\alias{RiskPortfolios-package}
 \alias{RiskPortfolios}
 \title{RiskPortfolios: Computation of risk-based portfolios in R}
 \description{
@@ -79,9 +80,17 @@ Maillard, S., Roncalli, T., Teiletche, J. (2010).
 The properties of equally weighted risk contribution portfolios.  
 \emph{Journal of Portfolio Management} \bold{36}(4), pp.60-70. 
 
-Martellini, L. (2008).  
+Martellini, L. (2008).
 Towards the design of better equity benchmarks.
 \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ArdiaD/RiskPortfolios}
+  \item Report bugs at \url{https://github.com/ArdiaD/RiskPortfolios/issues}
+}
+
 }
 \author{
 David Ardia, Kris Boudt and Jean-Philippe Gagnon-Fleury.

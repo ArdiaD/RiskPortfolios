@@ -24,17 +24,20 @@ components:
 \item \code{type} method used to compute the
 covariance matrix, among \code{'naive'}, \code{'ewma'}, \code{'lw'},
 \code{'factor'},\code{'const'}, \code{'cor'}, \code{'oneparm'},
-\code{'diag'} and \code{'large'} where: 
+\code{'diag'}, \code{'large'} and \code{'bs'} where:
 
-\code{'naive'} is used to compute 
-the naive (standard) covariance matrix. 
+\code{'naive'} is used to compute
+the naive (standard) covariance matrix.
 
-\code{'ewma'} is used to compute the exponential weighting moving average covariance matrix. The following formula is used 
+\code{'ewma'} is used to compute the exponential weighting moving average covariance matrix. The following formula is used
 to compute the ewma covariance matrix:
-\deqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda)r_{t-1}r_{t-1}}{Sigma[t]
-:= lambda * Sigma[t-1] + (1-lambda) r[t-1]'r[t-1]}
+\deqn{\Sigma := \frac{1-\lambda}{1-\lambda^T} \sum_{t=1}^{T} \lambda^{T-t} (r_t - \bar{r})(r_t - \bar{r})'}{Sigma
+:= (1-lambda)/(1-lambda^T) sum_t lambda^(T-t) (r[t] - rbar)(r[t] - rbar)'}
 where \eqn{r_t} is the \eqn{(N \times 1)}{(N x 1)} vector of returns at time
-\eqn{t}. Note that the data must be sorted from the oldest to the latest. See RiskMetrics (1996)
+\eqn{t}. The weights sum to one, so the estimator is the finite-sample
+counterpart of the recursion \eqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda) r_t r_t'}{Sigma[t]
+:= lambda * Sigma[t-1] + (1-lambda) r[t]r[t]'} started at zero.
+Note that the data must be sorted from the oldest to the latest. See RiskMetrics (1996)
 
 \code{'factor'} is used to compute the covariance matrix estimation using a
 K-factor approach. See Harman (1976).
@@ -61,23 +64,22 @@ See Ledoit and Wolf (2004).
 'prior' or 'shrinkage target'.  The prior is given by a diagonal matrix. 
 See Ledoit and Wolf (2002).
 
-\code{'large'} This estimator is a weighted average of the sample covariance
-matrix and a 'prior' or 'shrinkage target'. Here, the prior is given by a
-one-factor model. The factor is equal to the cross-sectional average of all
-the random variables. The weight, or 'shrinkage intensity' is chosen to
-minimize quadratic loss measured by the Frobenius norm. The estimator is
-valid as the number of variables and/or the number of observations go to
-infinity, but Monte-Carlo simulations show that it works well for values as
-low as 10. The main advantage is that this estimator is guaranteed to be
-invertible and well-conditioned even if variables outnumber observations. 
-See Ledoit and Wolf (2004).
+\code{'large'} is an alias of \code{'lw'}, kept for backward compatibility.
+The shrinkage intensity of the market-prior estimator is derived so as to
+minimize the quadratic loss measured by the Frobenius norm, and is valid as
+the number of variables and/or the number of observations go to infinity;
+Monte-Carlo simulations show that it works well for values as low as 10. The
+main advantage is that the estimator is guaranteed to be invertible and
+well-conditioned even if variables outnumber observations.
+See Ledoit and Wolf (2003, 2004).
 
 \code{'bs'} is the Bayes-Stein estimator for the covariance matrix given by
 Jorion (1986).
 
 Default: \code{type = 'naive'}.
 
-\item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
+\item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+Default: \code{lambda = 0.94}.
 
 \item \code{K} number of factors to use when the K-factor approach is
 chosen to estimate the covariance matrix. Default: \code{K = 1}.}
@@ -118,11 +120,14 @@ covEstimation(rets, control = list(type = 'cor'))
 # Shrinkage of the covariance matrix towards one-parameter matrix
 covEstimation(rets, control = list(type = 'oneparm'))
 
-# Shrinkage of the covaraince matrix towards diagonal matrix
+# Shrinkage of the covariance matrix towards diagonal matrix
 covEstimation(rets, control = list(type = 'diag'))
 
-# Shrinkage of the covariance matrix for large data set
+# Shrinkage of the covariance matrix for large data set (alias of 'lw')
 covEstimation(rets, control = list(type = 'large'))
+
+# Bayes-Stein estimation of the covariance
+covEstimation(rets, control = list(type = 'bs'))
 }
 \references{
 Jorion, P. (1986). 

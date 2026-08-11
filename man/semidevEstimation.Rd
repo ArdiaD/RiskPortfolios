@@ -32,15 +32,22 @@ semideviation. The data must be sorted from the oldest to the latest. See RiskMe
 
 The semideviation for one stock is computed as follows. First we select the
 returns which are smaller than the average of the past returns; we get a new
-vector of dimension \eqn{K \times 1, K \le N}{Kx1,K<=N}. Then, the weight \eqn{w_i}{w_i}
+vector of dimension \eqn{K \times 1, K \le T}{Kx1,K<=T}. Then, the weight \eqn{w_i}{w_i}
 for each observation at its corresponding time \eqn{t} is computed as \eqn{w
 = \lambda^{t}}{w=lambda^t}. We obtain a \eqn{K \times 1}{Kx1} vector. The vector of
 weights is then normalized.  Finally, the semideviation is obtained as the
 weighted standard deviation.
 
+Note that the weights are normalized over the \eqn{K} selected observations
+only, so that \code{'naive'} returns \eqn{\sqrt{K^{-1} \sum (r_t - \bar{r})^2}}{sqrt(1/K sum (r - rbar)^2)}
+over the returns below the mean, and not the \eqn{1/T} version of the
+semideviation. The two differ by a factor \eqn{\sqrt{T/K}}{sqrt(T/K)}, which is
+close to \eqn{\sqrt{2}}{sqrt(2)} for symmetric returns.
+
 Default: \code{type = 'naive'}.
 
-\item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
+\item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+Default: \code{lambda = 0.94}.
 }
 }
 \examples{

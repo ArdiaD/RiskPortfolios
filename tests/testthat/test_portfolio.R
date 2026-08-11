@@ -6,7 +6,7 @@ test_that("Portfolios", {
   set.seed(123)
   rets  = matrix(rnorm(T * N), nrow = T, ncol = N)
   
-  f.test.pos = function(W) {
+  f.test.pos = function(w) {
     out = all(w >= 0)
     return(out)
   }

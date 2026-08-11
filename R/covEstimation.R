@@ -8,18 +8,21 @@
 #' \item \code{type} method used to compute the
 #' covariance matrix, among \code{'naive'}, \code{'ewma'}, \code{'lw'},
 #' \code{'factor'},\code{'const'}, \code{'cor'}, \code{'oneparm'},
-#' \code{'diag'} and \code{'large'} where: 
-#' 
-#' \code{'naive'} is used to compute 
-#' the naive (standard) covariance matrix. 
-#' 
-#' \code{'ewma'} is used to compute the exponential weighting moving average covariance matrix. The following formula is used 
+#' \code{'diag'}, \code{'large'} and \code{'bs'} where:
+#'
+#' \code{'naive'} is used to compute
+#' the naive (standard) covariance matrix.
+#'
+#' \code{'ewma'} is used to compute the exponential weighting moving average covariance matrix. The following formula is used
 #' to compute the ewma covariance matrix:
-#' \deqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda)r_{t-1}r_{t-1}}{Sigma[t]
-#' := lambda * Sigma[t-1] + (1-lambda) r[t-1]'r[t-1]}
+#' \deqn{\Sigma := \frac{1-\lambda}{1-\lambda^T} \sum_{t=1}^{T} \lambda^{T-t} (r_t - \bar{r})(r_t - \bar{r})'}{Sigma
+#' := (1-lambda)/(1-lambda^T) sum_t lambda^(T-t) (r[t] - rbar)(r[t] - rbar)'}
 #' where \eqn{r_t} is the \eqn{(N \times 1)}{(N x 1)} vector of returns at time
-#' \eqn{t}. Note that the data must be sorted from the oldest to the latest. See RiskMetrics (1996)
-#' 
+#' \eqn{t}. The weights sum to one, so the estimator is the finite-sample
+#' counterpart of the recursion \eqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda) r_t r_t'}{Sigma[t]
+#' := lambda * Sigma[t-1] + (1-lambda) r[t]r[t]'} started at zero.
+#' Note that the data must be sorted from the oldest to the latest. See RiskMetrics (1996)
+#'
 #' \code{'factor'} is used to compute the covariance matrix estimation using a
 #' K-factor approach. See Harman (1976).
 #' 
@@ -45,27 +48,26 @@
 #' 'prior' or 'shrinkage target'.  The prior is given by a diagonal matrix. 
 #' See Ledoit and Wolf (2002).
 #' 
-#' \code{'large'} This estimator is a weighted average of the sample covariance
-#' matrix and a 'prior' or 'shrinkage target'. Here, the prior is given by a
-#' one-factor model. The factor is equal to the cross-sectional average of all
-#' the random variables. The weight, or 'shrinkage intensity' is chosen to
-#' minimize quadratic loss measured by the Frobenius norm. The estimator is
-#' valid as the number of variables and/or the number of observations go to
-#' infinity, but Monte-Carlo simulations show that it works well for values as
-#' low as 10. The main advantage is that this estimator is guaranteed to be
-#' invertible and well-conditioned even if variables outnumber observations. 
-#' See Ledoit and Wolf (2004).
-#' 
+#' \code{'large'} is an alias of \code{'lw'}, kept for backward compatibility.
+#' The shrinkage intensity of the market-prior estimator is derived so as to
+#' minimize the quadratic loss measured by the Frobenius norm, and is valid as
+#' the number of variables and/or the number of observations go to infinity;
+#' Monte-Carlo simulations show that it works well for values as low as 10. The
+#' main advantage is that the estimator is guaranteed to be invertible and
+#' well-conditioned even if variables outnumber observations.
+#' See Ledoit and Wolf (2003, 2004).
+#'
 #' \code{'bs'} is the Bayes-Stein estimator for the covariance matrix given by
 #' Jorion (1986).
-#' 
+#'
 #' Default: \code{type = 'naive'}.
-#' 
-#' \item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
-#' 
+#'
+#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+#' Default: \code{lambda = 0.94}.
+#'
 #' \item \code{K} number of factors to use when the K-factor approach is
-#' chosen to estimate the covariance matrix. Default: \code{K = 1}.} 
-#' 
+#' chosen to estimate the covariance matrix. Default: \code{K = 1}.}
+#'
 #' @param rets a matrix \eqn{(T \times N)}{(T x N)} of returns.
 #' @param control control parameters (see *Details*).
 #' @return A \eqn{(N \times N)}{(N x N)} covariance matrix.
@@ -129,13 +131,16 @@
 #' # Shrinkage of the covariance matrix towards one-parameter matrix
 #' covEstimation(rets, control = list(type = 'oneparm'))
 #' 
-#' # Shrinkage of the covaraince matrix towards diagonal matrix
+#' # Shrinkage of the covariance matrix towards diagonal matrix
 #' covEstimation(rets, control = list(type = 'diag'))
-#' 
-#' # Shrinkage of the covariance matrix for large data set
+#'
+#' # Shrinkage of the covariance matrix for large data set (alias of 'lw')
 #' covEstimation(rets, control = list(type = 'large'))
+#'
+#' # Bayes-Stein estimation of the covariance
+#' covEstimation(rets, control = list(type = 'bs'))
 #' @export
-#' @importFrom stats cor cov factanal lm median quantile sd
+#' @importFrom stats cor cov factanal median quantile sd
 covEstimation <- function(rets, control = list()) {
   if (missing(rets)) {
     stop("rets is missing")
@@ -180,19 +185,25 @@ covEstimation <- function(rets, control = list()) {
   if (!is.list(control)) {
     stop("control must be a list")
   }
-  if (length(control) == 0) {
-    control <- list(type = "naive", lambda = 0.94, K = 1)
-  }
   nam <- names(control)
+  type <- c("naive", "ewma", "lw", "factor", "const", "cor", "oneparm",
+            "diag", "large", "bs")
   if (!("type" %in% nam) || is.null(control$type)) {
-    control$type <- c("naive", "ewma", "lw", "factor", "rtm", "const", 
-                      "cor", "oneparm", "diag", "large", "bs")
+    control$type <- type
+  }
+  if (!(control$type[1] %in% type)) {
+    stop("control$type is not well defined")
   }
   if (!("lambda" %in% nam) || is.null(control$lambda)) {
     control$lambda <- 0.94
   }
+  .checkLambda(control$lambda)
   if (!("K" %in% nam) || is.null(control$K)) {
     control$K <- 1
+  }
+  if (!is.numeric(control$K) || length(control$K) != 1L || control$K < 1 ||
+      control$K != round(control$K)) {
+    stop("'K' must be a single positive integer")
   }
   return(control)
 }
@@ -207,25 +218,18 @@ covEstimation <- function(rets, control = list()) {
 
 .ewmaCov <- function(rets, lambda) {
   ## Compute the exponential weighted moving average covariance matrix
-  ## INPUTs rets : matrix (T x N) returns lambda : OUTPUTs Sigma : matrix
-  ## (N x N) covariance matrix DA check speed here (use just-in-time
-  ## compilation or compiler package)
-  
-  # # Infinite sample t = nrow(rets) n = ncol(rets) Sigma = matrix(0,
-  # ncol = n, nrow = n) Sigma = cov(rets)
-  
-  # for (i in 1 : t){ Sigma = lambda * Sigma + (1 - lambda) * outer(
-  # as.double(rets[i, ]), as.double(rets[i, ]) ) } Finite sample ewma
+  ## INPUTs rets : matrix (T x N) returns lambda : decay parameter
+  ## OUTPUTs Sigma : matrix (N x N) covariance matrix
+  ## Finite-sample ewma: the weights (1 - lambda)/(1 - lambda^t) * lambda^(t-i)
+  ## sum to one, which is the recursion started at Sigma = 0. Starting it at
+  ## cov(rets) instead would add a further lambda^t * cov(rets) on top of an
+  ## already normalized estimator, and inflate the covariance by a factor
+  ## (1 + lambda^t) -- 30% for t = 20 at the default lambda.
   t <- nrow(rets)
-  Sigma <- cov(rets)
-  # Sigma = matrix(0, ncol = dim(rets)[2], dim(rets)[2])
   mu <- colMeans(rets)
   shiftRets <- sweep(rets, 2, mu, "-")
-  for (i in 1:t) {
-    r <- as.double(shiftRets[i, ])
-    r2 <- outer(r, r)
-    Sigma <- (1 - lambda)/(1 - lambda^t) * r2 + lambda * Sigma
-  }
+  w <- (1 - lambda)/(1 - lambda^t) * lambda^((t - 1):0)
+  Sigma <- crossprod(sqrt(w) * shiftRets)
   return(Sigma)
 }
 
@@ -235,15 +239,15 @@ covEstimation <- function(rets, control = list()) {
   ## covariance matrix
   n <- dim(rets)[2]
   tmpMat <- matrix(rep(1, n^2), ncol = n)
-  
-  rho <- mean(cor(rets)[lower.tri(tmpMat, diag = FALSE)])
+
+  rho <- if (n > 1) mean(cor(rets)[lower.tri(tmpMat, diag = FALSE)]) else 0
   R <- rho * tmpMat
   diag(R) <- 1
-  
+
   std <- apply(rets, 2, sd)
-  diagStd <- diag(std)
+  diagStd <- diag(std, nrow = n)
   Sigma <- diagStd %*% R %*% diagStd
-  
+
   return(Sigma)
 }
 
@@ -251,17 +255,18 @@ covEstimation <- function(rets, control = list()) {
   ## Compute the covariance matrix using K-factor approach INPUTs rets :
   ## matrix (T x N) returns K : [scalar] number of factors OUTPUTs Sigma :
   ## matrix (N x N) covariance matrix NOTE Matlab function is factoran
-  ## (statistical toolbox) !!! TOFIX !!! valider avec Matlab
+  ## (statistical toolbox)
+  n <- dim(rets)[2]
   std <- apply(rets, 2, sd)
-  sigma <- cov(rets)
-  
-  loading <- factanal(rets, K)$loadings
-  uniquenesses <- factanal(rets, K)$uniquenesses
-  
-  R <- tcrossprod(loading) + diag(uniquenesses)
-  diagStd <- diag(std)
+
+  fit <- factanal(rets, K)
+  loading <- fit$loadings
+  uniquenesses <- fit$uniquenesses
+
+  R <- tcrossprod(loading) + diag(uniquenesses, nrow = n)
+  diagStd <- diag(std, nrow = n)
   Sigma <- diagStd %*% R %*% diagStd
-  
+
   return(Sigma)
 }
 
@@ -283,7 +288,7 @@ covEstimation <- function(rets, control = list()) {
     covmkt <- smple[1:n, n + 1]
     covmkt_ <- matrix(rep(covmkt, n), ncol = n, byrow = FALSE)
     varmkt <- as.numeric(smple[n + 1, n + 1])
-    smple <- smple[-(n + 1), -(n + 1)]
+    smple <- smple[-(n + 1), -(n + 1), drop = FALSE]
     
     prior <- outer(covmkt, covmkt)/varmkt
     diag(prior) <- diag(smple)
@@ -334,11 +339,8 @@ covEstimation <- function(rets, control = list()) {
   # Gamma hat
   gamma <- norm(smple - prior, "F")^2
   
-  # Kappa hat
-  kappa <- (phi - rho)/gamma
-  
   # shrinkage value
-  shrinkage <- pmax(0, pmin(1, kappa/t))
+  shrinkage <- .shrinkage(phi - rho, gamma, t)
   
   # Sigma hat
   Sigma <- shrinkage * prior + (1 - shrinkage) * smple
@@ -348,48 +350,13 @@ covEstimation <- function(rets, control = list()) {
 
 .largeCov <- function(rets) {
   ## INPUTs rets : matrix (T x N) returns OUTPUTs Sigma : matrix (N x N)
-  ## covariance matrix !!! TOFIX !!! largeCov ou puis-je trouver les
-  ## sources pour formules ?
-  lwCovElement <- .lwCovElement(rets, type = "large")
-  
-  t <- lwCovElement$t
-  n <- lwCovElement$n
-  mu <- lwCovElement$mu
-  shiftRets <- lwCovElement$shiftRets
-  
-  y <- lwCovElement$y
-  
-  mkt <- lwCovElement$mkt
-  covmkt <- lwCovElement$covmkt
-  covmkt_ <- lwCovElement$covmkt_
-  varmkt <- lwCovElement$varmkt
-  smple <- lwCovElement$smple
-  prior <- lwCovElement$prior
-  
-  z <- sweep(shiftRets, 1, mkt, "*")
-  
-  d <- 1/n * norm(smple - prior, "F")^2
-  r2 <- 1/n/t^2 * sum(apply(crossprod(y, y), 2, sum)) - 1/n/t * sum(apply(smple^2, 
-                                                                          2, sum))
-  
-  phidiag <- 1/n/t^2 * sum(apply(y^2, 2, sum)) - 1/n/t * sum(diag(smple)^2)
-  
-  v1 <- 1/t^2 * crossprod(y, z) - 1/t * covmkt_ * smple
-  
-  phioff1 <- 1/n * sum(apply(v1 * t(covmkt_), 2, sum))/varmkt - 1/n * 
-    sum(diag(v1) * covmkt)/varmkt
-  
-  v3 <- 1/t^2 * crossprod(z, z) - 1/t * varmkt * smple
-  
-  phioff3 <- 1/n * sum(apply(v3 * tcrossprod(covmkt, covmkt), 2, sum))/varmkt^2 - 
-    1/n * sum(diag(v3) * covmkt^2)/varmkt^2
-  
-  phioff <- 2 * phioff1 - phioff3
-  phi <- phidiag + phioff
-  
-  Sigma <- (r2 - phi)/d * prior + (1 - (r2 - phi)/d) * smple
-  
-  return(Sigma)
+  ## covariance matrix
+  ## 'large' used to carry its own transcription of covMarket.m in which every
+  ## quantity was scaled by 1/(n t). The scaling cancels in the shrinkage
+  ## intensity, so the estimator was numerically identical to 'lw' -- except
+  ## that the intensity was not truncated to [0, 1] and could turn negative
+  ## (anti-shrinkage) in small samples. It now delegates to .lwCov.
+  return(.lwCov(rets))
 }
 
 .corCov <- function(rets) {
@@ -409,7 +376,7 @@ covEstimation <- function(rets, control = list()) {
   sqrtvar <- sqrt(var)
   outerSqrtVar <- outer(sqrtvar, sqrtvar)
   
-  rBar <- (sum(sum(smple/outerSqrtVar)) - n)/(n * (n - 1))
+  rBar <- if (n > 1) (sum(sum(smple/outerSqrtVar)) - n)/(n * (n - 1)) else 0
   prior <- rBar * outerSqrtVar
   diag(prior) <- var
   
@@ -431,11 +398,8 @@ covEstimation <- function(rets, control = list()) {
   # gamma hat
   gamma <- norm(smple - prior, type = "F")^2
   
-  # kappa hat
-  kappa <- (phi - rho)/gamma
-  
   # shrinkage value
-  shrinkage <- pmax(0, pmin(1, kappa/t))
+  shrinkage <- .shrinkage(phi - rho, gamma, t)
   
   # Sigma hat
   Sigma <- shrinkage * prior + (1 - shrinkage) * smple
@@ -455,7 +419,7 @@ covEstimation <- function(rets, control = list()) {
   shiftRets <- lwCovElement$shiftRets
   y <- lwCovElement$y
   smple <- lwCovElement$smple
-  prior <- diag(diag(smple))
+  prior <- diag(diag(smple), nrow = n)
   
   # phi hat
   phiMat <- crossprod(y)/t - 2 * (crossprod(shiftRets)) * smple/t + smple^2
@@ -467,11 +431,8 @@ covEstimation <- function(rets, control = list()) {
   # gamma hat
   gamma <- norm(smple - prior, "F")^2
   
-  # kappa hat
-  kappa <- (phi - rho)/gamma
-  
   # shrinkage value
-  shrinkage <- pmax(0, pmin(1, kappa/t))
+  shrinkage <- .shrinkage(phi - rho, gamma, t)
   
   # Sigma hat
   Sigma <- shrinkage * prior + (1 - shrinkage) * smple
@@ -501,11 +462,8 @@ covEstimation <- function(rets, control = list()) {
   # gamma hat
   gamma <- norm(smple - prior, type = "F")^2
   
-  # kappa hat
-  kappa <- phi/gamma
-  
   # shrinkage value
-  shrinkage <- pmax(0, pmin(1, kappa/t))
+  shrinkage <- .shrinkage(phi, gamma, t)
   
   # Sigma hat
   Sigma <- shrinkage * prior + (1 - shrinkage) * smple
@@ -519,26 +477,30 @@ covEstimation <- function(rets, control = list()) {
   ## returns OUTPUTs Sigma : Matrix (N x N) covariance David : see
   ## Kolusheva, Daniela. (July 2008) Out-of-sample Performance of Asset
   ## Allocation Strategies
-  lwCovElement <- .lwCovElement(rets, type = "lw")
-  t <- lwCovElement$t
-  n <- lwCovElement$n
-  
+  t <- dim(rets)[1]
+  n <- dim(rets)[2]
+
   mu <- colMeans(rets)
   Sigma <- cov(rets)
   invSigma <- solve(Sigma)
-  
+
   i <- rep(1, n)
   invSigmai <- crossprod(invSigma, i)
   w_min <- (invSigmai)/as.numeric(crossprod(i, invSigmai))
-  mu_min <- crossprod(mu, w_min)
+  mu_min <- as.numeric(crossprod(mu, w_min))
   invSigmaMu <- crossprod(invSigma, mu - mu_min)
-  phi <- (n + 2)/((n + 2) + t * crossprod(mu - mu_min, invSigmaMu))
+  phi <- (n + 2)/((n + 2) + t * as.numeric(crossprod(mu - mu_min, invSigmaMu)))
   phi <- max(min(phi, 1), 0)
-  
+
   tau <- t * phi/(1 - phi)
-  
-  Sigma <- Sigma * (1 + 1/(t + tau)) + 
-    tau/(t * (t + 1 + tau)) * outer(i, i)/as.numeric(crossprod(i, invSigmai))
-  
+
+  ## phi = 1 (all expected returns equal) gives tau = Inf; the limits of the
+  ## two coefficients below are 1 and 1/t.
+  cSigma <- if (is.finite(tau)) 1 + 1/(t + tau) else 1
+  cPrior <- if (is.finite(tau)) tau/(t * (t + 1 + tau)) else 1/t
+
+  Sigma <- Sigma * cSigma +
+    cPrior * outer(i, i)/as.numeric(crossprod(i, invSigmai))
+
   return(Sigma)
 }

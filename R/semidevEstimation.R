@@ -16,15 +16,22 @@
 #' 
 #' The semideviation for one stock is computed as follows. First we select the
 #' returns which are smaller than the average of the past returns; we get a new
-#' vector of dimension \eqn{K \times 1, K \le N}{Kx1,K<=N}. Then, the weight \eqn{w_i}{w_i}
+#' vector of dimension \eqn{K \times 1, K \le T}{Kx1,K<=T}. Then, the weight \eqn{w_i}{w_i}
 #' for each observation at its corresponding time \eqn{t} is computed as \eqn{w
 #' = \lambda^{t}}{w=lambda^t}. We obtain a \eqn{K \times 1}{Kx1} vector. The vector of
 #' weights is then normalized.  Finally, the semideviation is obtained as the
 #' weighted standard deviation.
-#' 
+#'
+#' Note that the weights are normalized over the \eqn{K} selected observations
+#' only, so that \code{'naive'} returns \eqn{\sqrt{K^{-1} \sum (r_t - \bar{r})^2}}{sqrt(1/K sum (r - rbar)^2)}
+#' over the returns below the mean, and not the \eqn{1/T} version of the
+#' semideviation. The two differ by a factor \eqn{\sqrt{T/K}}{sqrt(T/K)}, which is
+#' close to \eqn{\sqrt{2}}{sqrt(2)} for symmetric returns.
+#'
 #' Default: \code{type = 'naive'}.
-#' 
-#' \item \code{lambda} decay parameter. Default: \code{lambda = 0.94}.
+#'
+#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+#' Default: \code{lambda = 0.94}.
 #' }
 #' 
 #' @param rets a \eqn{(T \times N)}{(T x N)} matrix of past returns.
@@ -79,16 +86,18 @@ semidevEstimation <- function(rets, control = list()) {
   if (!is.list(control)) {
     stop("control must be a list")
   }
-  if (length(control) == 0) {
-    control <- list(type = "naive", lambda = 0.94)
-  }
   nam <- names(control)
+  type <- c("naive", "ewma")
   if (!("type" %in% nam) || is.null(control$type)) {
-    control$type <- c("naive", "ewma")
+    control$type <- type
+  }
+  if (!(control$type[1] %in% type)) {
+    stop("control$type is not well defined")
   }
   if (!("lambda" %in% nam) || is.null(control$lambda)) {
     control$lambda <- 0.94
   }
+  .checkLambda(control$lambda)
   return(control)
 }
 
@@ -111,6 +120,11 @@ semidevEstimation <- function(rets, control = list()) {
     retsj <- rets[, j]
     muj <- mu[j]
     idx <- retsj < muj
+    if (!any(idx)) {
+      ## constant series: no return below the mean, the semideviation is zero
+      semiDev[j] <- 0
+      next
+    }
     wj <- w[idx]/sum(w[idx])
     semiDev[j] <- sqrt(sum(wj * (retsj[idx] - muj)^2))
   }

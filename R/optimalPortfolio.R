@@ -1,7 +1,7 @@
 #' @name optimalPortfolio
 #' @aliases optimalPortfolio
 #' @title Optimal portfolio
-#' @description Function wich computes the optimal portfolio's weights.
+#' @description Function which computes the optimal portfolio's weights.
 #' @details The argument \code{control} is a list that can supply any of the following
 #' components: 
 #' \itemize{
@@ -9,22 +9,46 @@
 #' optimal portfolio, among \code{'mv'}, \code{'minvol'}, \code{'invvol'},
 #' \code{'erc'}, \code{'maxdiv'}, \code{'riskeff'} and \code{'maxdec'} where: 
 #' 
-#' \code{'mv'} is used to compute the weights of the mean-variance portfolio. The weights are
-#' computed following this equation: \deqn{w = \frac{1}{\gamma} \Sigma^{-1}
-#' \mu }{w = 1 / \gamma \Sigma^{-1} \mu}. 
-#' 
-#' \code{'minvol'} is used to compute the weights of the minimum variance portfolio.  
-#' 
-#' \code{'invvol'} is the inverse volatility portfolio.
-#' 
-#' \code{'erc'} is used to compute the weights of the equal-risk-contribution portfolio. For a 
+#' \code{'mv'} is used to compute the weights of the mean-variance portfolio, that
+#' is the solution of \deqn{\max_w \left\{ w' \mu - \frac{\gamma}{2} w' \Sigma w \right\}
+#' \quad s.t. \quad w'1 = 1}{max_w {w'mu - gamma/2 w'Sigma w} s.t. w'1 = 1}
+#' and, in the unconstrained case, is given in two-fund form by
+#' \deqn{w = \frac{\Sigma^{-1} 1}{1' \Sigma^{-1} 1} + \frac{1}{\gamma} \left( \Sigma^{-1} \mu -
+#' \frac{1' \Sigma^{-1} \mu}{1' \Sigma^{-1} 1} \Sigma^{-1} 1 \right)}{w = Sigma^-1 1 / (1'Sigma^-1 1)
+#' + 1/gamma (Sigma^-1 mu - (1'Sigma^-1 mu)/(1'Sigma^-1 1) Sigma^-1 1)}
+#' that is, the minimum-variance portfolio plus \eqn{1/\gamma}{1/gamma} times a
+#' self-financing speculative portfolio. Note that the summability constraint is
+#' imposed here as it is for the other portfolios, so the risk aversion
+#' \eqn{\gamma}{gamma} governs the tilt away from the minimum-variance portfolio
+#' rather than the leverage.
+#'
+#' \code{'minvol'} is used to compute the weights of the minimum variance portfolio.
+#'
+#' \code{'invvol'} is the inverse volatility portfolio. It is computed in closed
+#' form and is always long-only with weights summing to one, so the \code{'lo'}
+#' and \code{'gross'} constraints hold automatically. Bounds do not enter its
+#' definition: if \code{LB}/\code{UB} are supplied and bind, the weights are
+#' projected onto \eqn{\{LB \le w \le UB, w'1 = 1\}}{{LB <= w <= UB, w'1 = 1}}
+#' and a warning is issued.
+#'
+#' \code{'erc'} is used to compute the weights of the equal-risk-contribution portfolio. For a
 #' portfolio \eqn{w}, the percentage volatility risk contribution of the i-th
-#' asset in the portfolio is given by: 
-#' \deqn{\% RC_i = \frac{ w_i {[\Sigma w]}_i}{w' \Sigma w} }{ RC_i = w_i[\Sigma w]_i / (w' \Sigma w)}. 
+#' asset in the portfolio is given by:
+#' \deqn{\% RC_i = \frac{ w_i {[\Sigma w]}_i}{w' \Sigma w} }{ RC_i = w_i[\Sigma w]_i / (w' \Sigma w)}.
 #' Then we compute the optimal portfolio by solving the following optimization problem:
 #' \deqn{w = argmin \left\{ \sum_{i=1}^N (\% RC_i - \frac{1}{N})^2 \right\}
 #' }{ argmin { \sum_{i=1}^{N} (RC_i - 1/N)^2} }.
-#' 
+#' Without bounds, or under the long-only constraint, the solution is obtained
+#' exactly by solving \eqn{y_i [\Sigma y]_i = 1/N}{y[i] [Sigma y][i] = 1/N} for
+#' \eqn{y > 0}{y > 0} and rescaling to \eqn{w = y / (y'1)}{w = y / (y'1)}, which
+#' attains a zero objective. See Spinu (2013) and Chaves et al. (2012). This is
+#' necessary because the objective above is not convex and admits local minima on
+#' the boundary at which whole groups of assets receive a zero weight; a
+#' general-purpose optimizer started at the equally-weighted portfolio converges
+#' to them whenever the correlation matrix has sizeable negative entries. Under
+#' \code{'user'} or \code{'gross'} constraints the problem is solved numerically
+#' from several starting values.
+#'
 #' \code{'maxdiv'} is used to compute the weights of the maximum diversification portfolio where:
 #' \deqn{DR(w) = \frac{ w' \sigma}{\sqrt{w' \Sigma w} } \geq 1 }{ DR(w) = (w'
 #' \sigma)/(\sqrt(w' \Sigma w)) \ge 1} is used in the optimization problem.
@@ -37,35 +61,50 @@
 #' \eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}. 
 #' 
 #' \code{'maxdec'} is used to compute the weights of the maximum-decorrelation
-#' portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' \Sigma w} \right\}
-#' }{w = argmax {1- \sqrt(w' R w)}} where \eqn{R} is the correlation matrix. 
+#' portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' R w} \right\}
+#' }{w = argmax {1- \sqrt(w' R w)}} where \eqn{R} is the correlation matrix.
 #' 
 #' Default: \code{type = 'mv'}.
 #' 
 #' These portfolios are summarized in Ardia and Boudt (2015) and Ardia et al. (2017). Below we list the various references.
 #' 
 #' \item \code{constraint} constraint used for the optimization, among
-#' \code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to 
-#' compute the unconstraint portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),  
+#' \code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to
+#' compute the unconstraint portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),
 #' \code{'gross'} is the gross exposure constraint, and \code{'user'} is the set of user constraints (typically
-#' lower and upper boundaries. Default: \code{constraint = 'none'}. Note that the 
+#' lower and upper boundaries). Default: \code{constraint = 'none'}. Note that the
 #' summability constraint is always imposed.
-#' 
-#' \item \code{LB} lower boundary for the weights. Default: \code{LB = NULL}. 
-#' 
-#' \item \code{UB} lower boundary for the weights. Default: \code{UB = NULL}. 
-#' 
-#' \item \code{w0} starting value for the optimizer. Default: \code{w0 = NULL} takes the 
-#' equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it is set to 
-#' mid-point of the bounds.
-#' 
-#' \item \code{gross.c} gross exposure constraint. Default: \code{gross.c = 1.6}. 
-#' 
-#' \item \code{gamma} risk aversion parameter. Default: \code{gamma = 0.89}.
-#' 
-#' \item \code{ctr.slsqp} list with control parameters for slsqp function.
+#'
+#' \item \code{LB} lower boundary for the weights. Default: \code{LB = NULL}.
+#'
+#' \item \code{UB} upper boundary for the weights. Default: \code{UB = NULL}.
+#'
+#' \item \code{w0} starting value for the optimizer. Default: \code{w0 = NULL} takes the
+#' equally-weighted portfolio as a starting value. When \code{LB} and \code{UB} are provided, it is set to
+#' mid-point of the bounds. For the non-convex problems (\code{'erc'} under
+#' \code{'user'}/\code{'gross'} constraints, \code{'maxdiv'} and \code{'riskeff'})
+#' \code{w0} is one of several starting values that are tried, the best solution
+#' being returned.
+#'
+#' \item \code{gross.c} gross exposure constraint, that is the bound imposed on
+#' \eqn{\|w\|_1}{||w||_1}. Since the weights sum to one, it cannot be smaller
+#' than one. Default: \code{gross.c = 1.6}.
+#'
+#' \item \code{gamma} risk aversion parameter, a single positive number.
+#' Default: \code{gamma = 0.89}.
+#'
+#' \item \code{ctr.slsqp} list with control parameters for the
+#' \code{\link[nloptr]{slsqp}} function. Default:
+#' \code{list(xtol_rel = 1e-18, ftol_rel = 1e-12, check_derivatives = FALSE,
+#' maxeval = 2000)}. \code{xtol_rel} is below double precision and so cannot be
+#' met on its own; \code{ftol_rel} supplies an attainable stopping criterion, and
+#' the optimizer warns if it stops on \code{maxeval} instead of converging. Under
+#' the \code{'gross'} constraint, stopping on \code{ftol_rel} rather than
+#' exhausting the budget can leave up to about \eqn{2 \times 10^{-5}}{2e-5} of
+#' relative objective on the table; pass a smaller \code{ftol_rel} if that
+#' matters more than the runtime.
 #' }
-#' 
+#'
 #' @param Sigma a \eqn{(N \times N)}{(N x N)} covariance matrix.
 #' @param mu a \eqn{(N \times 1)}{(N x 1)} vector of expected returns. Default:
 #' \code{mu = NULL}.
@@ -76,7 +115,7 @@
 #' @author David Ardia, Kris Boudt and Jean-Philippe Gagnon Fleury.
 #' @references 
 #' Amenc, N., Goltz, F., Martellini, L., Retowsky, P. (2011).
-#' Efficient indexation: An alternatice to cap-weightes indices.  
+#' Efficient indexation: An alternative to cap-weighted indices.  
 #' \emph{Journal of Investment Management} \bold{9}(4), pp.1-23.
 #' 
 #' Ardia, D., Boudt, K. (2015). 
@@ -89,14 +128,18 @@
 #' \emph{Annals of Operations Research} \bold{254}(1-2), pp.1-16. 
 #' \doi{10.1007/s10479-017-2474-7}
 #' 
-#' Choueifaty, Y., Coignard, Y. (2008).  
+#' Chaves, D., Hsu, J., Li, F., Shakernia, O. (2012).
+#' Efficient algorithms for computing risk parity portfolio weights.
+#' \emph{Journal of Investing} \bold{21}(3), pp.150-163.
+#'
+#' Choueifaty, Y., Coignard, Y. (2008).
 #' Toward maximum diversification.
-#' \emph{Journal of Portfolio Management} \bold{35}(1), pp.40-51. 
-#' 
-#' Choueifaty, Y., Froidure, T., Reynier, J. (2013).  
-#' Properties of the most diversified portfolio.  
-#' \emph{Journal of Investment Strategies} \bold{2}(2), pp.49-70. 
-#' 
+#' \emph{Journal of Portfolio Management} \bold{35}(1), pp.40-51.
+#'
+#' Choueifaty, Y., Froidure, T., Reynier, J. (2013).
+#' Properties of the most diversified portfolio.
+#' \emph{Journal of Investment Strategies} \bold{2}(2), pp.49-70.
+#'
 #' Das, S., Markowitz, H., Scheid, J., Statman, M. (2010).  
 #' Portfolio optimization with mental accounts.  
 #' \emph{Journal of Financial and Quantitative Analysis} \bold{45}(2), pp.311-334. 
@@ -113,9 +156,14 @@
 #' The properties of equally weighted risk contribution portfolios.  
 #' \emph{Journal of Portfolio Management} \bold{36}(4), pp.60-70. 
 #' 
-#' Martellini, L. (2008).  
+#' Martellini, L. (2008).
 #' Towards the design of better equity benchmarks.
-#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41. 
+#' \emph{Journal of Portfolio Management} \bold{34}(4), Summer,pp.34-41.
+#'
+#' Spinu, F. (2013).
+#' An algorithm for computing risk parity weights.
+#' \emph{SSRN working paper}.
+#' \doi{10.2139/ssrn.2297383}
 #' @keywords optimize
 #' @examples
 #' # Load returns of assets or portfolios
@@ -206,11 +254,11 @@
 #' optimalPortfolio(Sigma = Sigma, 
 #'   control = list(type = 'maxdiv'))
 #' 
-#' # Maximum diversification portoflio with the long-only constraint
+#' # Maximum diversification portfolio with the long-only constraint
 #' optimalPortfolio(Sigma = Sigma, 
 #'   control = list(type = 'maxdiv', constraint = 'lo'))
 #'   
-#' # Maximum diversification portoflio with LB and UB constraints
+#' # Maximum diversification portfolio with LB and UB constraints
 #' optimalPortfolio(Sigma = Sigma, 
 #'   control = list(type = 'maxdiv', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 #' 
@@ -230,11 +278,11 @@
 #' optimalPortfolio(Sigma = Sigma, 
 #'   control = list(type = 'maxdec'))
 #' 
-#' # Maximum decorrelation portoflio with the long-only constraint
+#' # Maximum decorrelation portfolio with the long-only constraint
 #' optimalPortfolio(Sigma = Sigma, 
 #'   control = list(type = 'maxdec', constraint = 'lo'))
 #'   
-#' # Maximum decorrelation portoflio with LB and UB constraints
+#' # Maximum decorrelation portfolio with LB and UB constraints
 #' optimalPortfolio(Sigma = Sigma, 
 #'   control = list(type = 'maxdec', constraint = 'user', LB = rep(0.02, 10), UB = rep(0.8, 10)))
 #' @export
@@ -250,10 +298,16 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (!isSymmetric(Sigma)) {
     stop("Sigma must be a symmetric matrix")
   }
-  
+
   n = dim(Sigma)[1]
+  if (!is.null(mu) && length(mu) != n) {
+    stop("mu must be of the same dimension as Sigma")
+  }
+  if (!is.null(semiDev) && length(semiDev) != n) {
+    stop("semiDev must be of the same dimension as Sigma")
+  }
   ctr <- .ctrPortfolio(n, control)
-  
+
   if (ctr$type[1] == "mv") {
     w <- .mvPortfolio(mu = mu, Sigma = Sigma, control = control)
   } else if (ctr$type[1] == "minvol") {
@@ -283,10 +337,6 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (!is.list(control)) {
     stop("control must be a list")
   }
-  if (length(control) == 0) {
-    control <- list(type = "mv", constraint = "none", gross.c = 1.6, 
-                    LB = NULL, UB = NULL, w0 = NULL, gamma = 0.89, ctr.slsqp = NULL)
-  }
   nam <- names(control)
   ## type
   type <- c("mv", "minvol", "erc", "maxdiv", "riskeff", "invvol", "maxdec")
@@ -296,7 +346,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (!(control$type[1] %in% type)) {
     stop("'type' is not properly defined")
   }
-  
+
   ## constraint
   constraint <- c("none", "lo", "gross", "user")
   if (!("constraint" %in% nam) || is.null(control$constraint)) {
@@ -305,17 +355,22 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (!(control$constraint[1] %in% constraint)) {
     stop("'constraint' is not properly defined")
   }
-  
+
   ## gross.c
   if (!("gross.c" %in% nam) || is.null(control$gross.c)) {
     control$gross.c <- 1.6
   }
-  if (constraint[1] == "gross") {
-    if (!is.numeric(control$gross.c)) {
+  if (control$constraint[1] == "gross") {
+    if (!is.numeric(control$gross.c) || length(control$gross.c) != 1L ||
+        !is.finite(control$gross.c)) {
       stop("'gross.c' is not properly defined")
     }
+    if (control$gross.c < 1) {
+      stop("'gross.c' must be at least one: the weights sum to one, so ",
+           "||w||_1 >= 1 for any admissible portfolio")
+    }
   }
-  
+
   ## user LB and UB
   if (!("LB" %in% nam) || is.null(control$LB)) {
     control$LB <- NULL
@@ -323,18 +378,29 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (!("UB" %in% nam) || is.null(control$UB)) {
     control$UB <- NULL
   }
-  if (control$constraint[1] == "user") {
-    if (is.null(control$LB) || (length(control$LB) != n)) {
-      stop("'LB' is not properly defined")
-    }
-    if (is.null(control$UB) || (length(control$UB) != n)) {
-      stop("'UB' is not properly defined")
-    }
+  if (control$constraint[1] == "user" && (is.null(control$LB) || is.null(control$UB))) {
+    stop("'LB' and 'UB' are required when constraint = 'user'")
+  }
+  ## the bounds are checked whenever they are supplied, not only under the
+  ## 'user' constraint: they are passed to the optimizer under 'gross' as well,
+  ## and bounds incompatible with 1'w = 1 make the problem infeasible
+  if (!is.null(control$LB) && ((length(control$LB) != n) || !all(is.finite(control$LB)))) {
+    stop("'LB' is not properly defined")
+  }
+  if (!is.null(control$UB) && ((length(control$UB) != n) || !all(is.finite(control$UB)))) {
+    stop("'UB' is not properly defined")
+  }
+  if (!is.null(control$LB) && !is.null(control$UB) && any(control$LB > control$UB)) {
+    stop("'LB' must not exceed 'UB'")
+  }
+  if ((!is.null(control$LB) && sum(control$LB) > 1) ||
+      (!is.null(control$UB) && sum(control$UB) < 1)) {
+    stop("'LB' and 'UB' are incompatible with the summability constraint")
   }
   if (control$constraint[1] == "lo") {
     control$LB <- rep(0, n)
   }
-  
+
   ## starting portfolio
   if (!("w0" %in% nam) || is.null(control$w0)) {
     control$w0 <- rep(1, n) / n
@@ -342,26 +408,39 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
       control$w0 = 0.5 * (control$LB + control$UB)
     }
   }
-  if (length(control$w0) != n) {
+  if (length(control$w0) != n || !all(is.finite(control$w0))) {
     stop("'w0' is not properly defined")
   }
-  
+  ## slsqp rejects a starting value outside the bounds, so w0 -- whether it is
+  ## the equally-weighted default or was supplied by the caller -- is projected
+  ## onto {LB <= w <= UB, w'1 = 1}. Without this, a perfectly feasible problem
+  ## such as constraint = 'gross' with LB = c(0.9, 0, 0, 0) failed outright,
+  ## because the default w0 = 1/n violates LB.
+  if (!is.null(control$LB) || !is.null(control$UB)) {
+    control$w0 <- .projectBox(control$w0, control$LB, control$UB)
+  }
+
   # risk aversion parameter
   if (!("gamma" %in% nam) || is.null(control$gamma)) {
-    control$gamma <- c(0.8773, 2.7063, 3.795)
+    control$gamma <- 0.89
   }
-  if (!is.numeric(control$gamma)) {
+  if (!is.numeric(control$gamma) || !is.finite(control$gamma[1]) ||
+      control$gamma[1] <= 0) {
     stop("'gamma' is not properly defined")
   }
-  
+
   # optimization list
+  ## xtol_rel alone is below double precision and can essentially never be met,
+  ## so without ftol_rel the optimizer runs to maxeval on every gross-constrained
+  ## problem and its convergence status carries no information
   if (!("ctr.slsqp" %in% nam) || is.null(control$ctr.slsqp)) {
-    control$ctr.slsqp <- list(xtol_rel = 1e-18, check_derivatives = FALSE, maxeval = 2000)
+    control$ctr.slsqp <- list(xtol_rel = 1e-18, ftol_rel = 1e-12,
+                              check_derivatives = FALSE, maxeval = 2000)
   }
   if (!is.list(control$ctr.slsqp)) {
     stop("'ctr.slsqp' is not properly defined")
   }
-  
+
   return(control)
 }
 
@@ -376,8 +455,16 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     stop("A vector of mean (mu) is required to compute the mean-variance portfolio")
   }
   if (ctr$constraint[1] == "none") {
+    ## Solution of max_w {w'mu - gamma/2 w'Sigma w} s.t. w'1 = 1, in two-fund
+    ## form: the minimum-variance portfolio plus 1/gamma times a self-financing
+    ## speculative portfolio. Rescaling Sigma^-1 mu to sum to one instead would
+    ## cancel gamma altogether, and would flip the sign of the whole portfolio
+    ## whenever 1'Sigma^-1 mu < 0.
+    invSigma1 <- solve(Sigma, rep(1, n))
     invSigmamu <- solve(Sigma, mu)
-    w <- (1/ctr$gamma[1]) * invSigmamu/sum(invSigmamu) 
+    a <- sum(invSigma1)
+    b <- sum(invSigmamu)
+    w <- invSigma1/a + (1/ctr$gamma[1]) * (invSigmamu - (b/a) * invSigma1)
   } else if (ctr$constraint[1] == "lo" || ctr$constraint[1] == "user") {
     Dmat <- ctr$gamma[1] * Sigma
     Amat <- cbind(rep(1, n), diag(n))
@@ -398,21 +485,15 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     .gradmeanvar <- function(w)
     {
       g <- -mu + ctr$gamma[1] * crossprod(Sigma, w)
-    } 
+    }
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
-    w <- nloptr::slsqp(x0 = ctr$w0, fn = .meanvar,
-                       gr = .gradmeanvar,
-                       hin = ..grossContraint, 
-                       heq = .eqConstraint, 
-                       lower = ctr$LB,
-                       upper = ctr$UB,
-                       nl.info = FALSE, control = ctr$ctr.slsqp)$par
+    ## convex problem: a single starting value is enough
+    w <- .slsqpBest(starts = list(ctr$w0), fn = .meanvar,
+                    gr = .gradmeanvar, hin = ..grossContraint, ctr = ctr)
   } else {
     # spotted in controls
   }
-  w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
-  w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
-  w <- w / sum(w)
+  w <- .finalizeWeights(w, ctr)
   return(w)
 }
 
@@ -445,23 +526,17 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     .gradminvol <- function(w)
     {
       Sigmaw <- crossprod(Sigma, w)
-      g <- 2 * Sigmaw 
+      g <- 2 * Sigmaw
 #       g <- Sigmaw / sqrt(as.numeric(crossprod(w, Sigmaw)))
-    }    
+    }
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
-    w <- nloptr::slsqp(x0 = ctr$w0, fn = .minvol,
-                       gr = .gradminvol,
-                       hin = ..grossContraint, 
-                       heq = .eqConstraint,
-                       lower = ctr$LB,
-                       upper = ctr$UB,
-                       nl.info = FALSE,  control = ctr$ctr.slsqp)$par
+    ## convex problem: a single starting value is enough
+    w <- .slsqpBest(starts = list(ctr$w0), fn = .minvol,
+                    gr = .gradminvol, hin = ..grossContraint, ctr = ctr)
   } else {
     # spotted in controls
   }
-  w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
-  w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
-  w <- w / sum(w)
+  w <- .finalizeWeights(w, ctr)
   return(w)
 }
 
@@ -469,10 +544,54 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ## Compute the weight of the inverse-volatility portfolio INPUTs Sigma :
   ## matrix (N x N) covariance matrix control : list of control parameters
   ## OUTPUTs w : vector (N x 1) weight
-  
+  n <- dim(Sigma)[1]
+  ctr <- .ctrPortfolio(n, control)
+
+  ## The inverse-volatility portfolio is defined in closed form; it is always
+  ## long-only and sums to one, so 'lo' and 'gross' hold automatically. Bounds
+  ## do not enter its definition, but returning weights that violate the bounds
+  ## the caller asked for is not an option either, so they are projected onto
+  ## {LB <= w <= UB, w'1 = 1} and the caller is told.
   sig <- sqrt(diag(Sigma))
   w <- 1/sig
   w <- w/sum(w)
+
+  if (!is.null(ctr$LB) || !is.null(ctr$UB)) {
+    wp <- .projectBox(w, ctr$LB, ctr$UB)
+    if (max(abs(wp - w)) > 1e-12) {
+      warning("the inverse-volatility weights violate 'LB'/'UB'; they have been ",
+              "projected onto the bounds and no longer are exactly proportional ",
+              "to the inverse volatilities")
+    }
+    w <- wp
+  }
+  return(w)
+}
+
+.ercExact <- function(Sigma, tol = 1e-14, maxit = 1000L) {
+  ## Exact equal-risk-contribution weights. Solve y_i [Sigma y]_i = 1/N for
+  ## y > 0 by cyclical coordinate descent -- each update is the positive root
+  ## of Sigma_ii y_i^2 + (sum_{j != i} Sigma_ij y_j) y_i - 1/N = 0 -- and
+  ## rescale to w = y / (y'1). This is the minimiser of the objective in
+  ## '?optimalPortfolio' (it attains zero) and it is always strictly positive,
+  ## so it satisfies the long-only constraint. See Spinu (2013).
+  n <- dim(Sigma)[1]
+  d <- diag(Sigma)
+  if (any(!is.finite(d)) || any(d <= 0)) {
+    stop("Sigma must have positive diagonal entries to compute the erc portfolio")
+  }
+  y <- 1/sqrt(d)
+  for (it in seq_len(maxit)) {
+    yOld <- y
+    for (i in 1:n) {
+      b <- if (n > 1) sum(Sigma[i, -i] * y[-i]) else 0
+      y[i] <- (-b + sqrt(b^2 + 4 * d[i]/n))/(2 * d[i])
+    }
+    if (max(abs(y - yOld)) < tol * max(1, max(abs(y)))) {
+      break
+    }
+  }
+  w <- as.numeric(y/sum(y))
   return(w)
 }
 
@@ -482,17 +601,26 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ## parameters OUTPUTs w : vector (N x 1) weight
   n <- dim(Sigma)[2]
   ctr <- .ctrPortfolio(n, control)
-  # DA user could use this instead of equal weighted
-  # w0 <- 1/sqrt(diag(Sigma))
-  # w0 <- w0/sum(w0)
-  
+
+  ## Without bounds, or under the long-only constraint, the exact solution is
+  ## available in closed-ish form and is strictly positive. The squared
+  ## deviation objective below is not convex: it has local minima on the
+  ## boundary where a whole block of assets is dropped and the survivors are
+  ## equalised at 1/(N - k), and slsqp started at the equally-weighted
+  ## portfolio converges to one of them as soon as the correlation matrix has
+  ## sizeable negative entries.
+  if (ctr$constraint[1] == "none" || ctr$constraint[1] == "lo") {
+    w <- .ercExact(Sigma)
+    return(.finalizeWeights(w, ctr))
+  }
+
   .pRC <- function(w) {
     Sigmaw <- crossprod(Sigma, w)
     pRC <- (w * Sigmaw)/as.numeric(crossprod(w, Sigmaw))
     d <- sum((pRC - 1/n)^2)
     return(d)
   }
-  
+
   .gradERC <- function(w)
   {
     Sigmaw <- crossprod(Sigma, w)
@@ -501,23 +629,20 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     f <- pRC - 1/n
     g <- 2 * (sig_p^2 * (crossprod(Sigma, (w * f)) + f * Sigmaw) - 2 * Sigmaw * as.numeric(crossprod(w * f, Sigmaw))) / sig_p^4
   }
-  
+
   ..grossContraint = NULL
   if (ctr$constraint[1] == "gross") {
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
   }
-  
-  w <- nloptr::slsqp(x0 = ctr$w0, fn = .pRC, 
-                     gr = .gradERC,
-                     hin = ..grossContraint,
-                     heq = .eqConstraint, 
-                     lower = ctr$LB, 
-                     upper = ctr$UB, 
-                     nl.info = FALSE, control = ctr$ctr.slsqp)$par
-  
-  w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
-  w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
-  w <- w / sum(w)
+
+  ## the unconstrained erc portfolio is the natural extra starting value here
+  starts <- .startingValues(ctr, Sigma)
+  starts <- unique(c(starts, list(.projectBox(.ercExact(Sigma), ctr$LB, ctr$UB))))
+
+  w <- .slsqpBest(starts = starts, fn = .pRC, gr = .gradERC,
+                  hin = ..grossContraint, ctr = ctr)
+
+  w <- .finalizeWeights(w, ctr)
   return(w)
 }
 
@@ -548,18 +673,11 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (ctr$constraint[1] == "gross") {
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
   }
-  
-  w <- nloptr::slsqp(x0 = ctr$w0, fn = .divRatio, 
-                     gr = .gradMaxDiv,
-                     hin = ..grossContraint,
-                     heq = .eqConstraint, 
-                     lower = ctr$LB, 
-                     upper = ctr$UB, 
-                     nl.info = FALSE, control = ctr$ctr.slsqp)$par
-  
-  w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
-  w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
-  w <- w / sum(w)
+
+  w <- .slsqpBest(starts = .startingValues(ctr, Sigma), fn = .divRatio,
+                  gr = .gradMaxDiv, hin = ..grossContraint, ctr = ctr)
+
+  w <- .finalizeWeights(w, ctr)
   return(w)
 }
 
@@ -571,33 +689,35 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ctr <- .ctrPortfolio(n, control)
   
   if (is.null(semiDev)) {
-    stop("A vector of semideviations (semiDev) is require to compute the risk-efficient portfolio")
+    stop("A vector of semideviations (semiDev) is required to compute the risk-efficient portfolio")
   }
   
-  pct <- c(0, quantile(semiDev, probs = seq(0.1, 1, 0.1)))
-  epsilon <- vector("double", n)
-  J <- matrix(rep(0, n^2), ncol = n)
-  
-  for (i in 2:11) {
-    pos <- semiDev > pct[i - 1] & semiDev <= pct[i]
-    J[pos, i - 1] <- 1
-    epsilon[i - 1] <- median(semiDev[pos])
+  ## J is (N x 10): one column per decile of the semideviations, whatever the
+  ## number of assets. Allocating it (N x N) instead made the loop below index
+  ## past the last column, and hence fail, for every portfolio of fewer than
+  ## ten assets. The lower edge of the first bin is -Inf so that every asset is
+  ## assigned to exactly one decile, and deciles left empty by ties get a zero
+  ## xi rather than an NA.
+  pct <- as.numeric(quantile(semiDev, probs = seq(0.1, 1, 0.1)))
+  lower <- c(-Inf, pct[1:9])
+  epsilon <- vector("double", 10)
+  J <- matrix(0, nrow = n, ncol = 10)
+
+  for (i in 1:10) {
+    pos <- semiDev > lower[i] & semiDev <= pct[i]
+    J[pos, i] <- 1
+    epsilon[i] <- if (any(pos)) median(semiDev[pos]) else 0
   }
   Jepsilon <- crossprod(t(J), epsilon)
   # DA Additional constraints used to stabilize optimization
-  LB <- ctr$LB
-  if (is.null(LB)) {
-    LB <- (1/(2 * n)) * rep(1, n)
+  if (is.null(ctr$LB)) {
+    ctr$LB <- (1/(2 * n)) * rep(1, n)
   }
-  UB <- ctr$UB
-  if (is.null(UB)) {
-    UB <- (2/n) * rep(1, n)
+  if (is.null(ctr$UB)) {
+    ctr$UB <- (2/n) * rep(1, n)
   }
+  ctr$w0 <- .projectBox(ctr$w0, ctr$LB, ctr$UB)
 
-  # DA overwrite w0 for better starting values
-  w0 <- (UB - LB)
-  w0 <- w0/sum(w0)
-  
   .distRiskEff <- function(w) {
     Sigmaw <- crossprod(Sigma, w)
     d <- as.numeric(-crossprod(w, Jepsilon)/sqrt(crossprod(w, Sigmaw)))
@@ -616,18 +736,11 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (ctr$constraint[1] == "gross") {
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
   }
-  
-  w <- nloptr::slsqp(x0 = ctr$w0, fn = .distRiskEff,
-                     gr = .gradRiskEff,
-                     hin = ..grossContraint,
-                     heq = .eqConstraint, 
-                     lower = LB, 
-                     upper = UB, 
-                     nl.info = FALSE, control = ctr$ctr.slsqp)$par
-  
-  w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
-  w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
-  w <- w / sum(w)
+
+  w <- .slsqpBest(starts = .startingValues(ctr, Sigma), fn = .distRiskEff,
+                  gr = .gradRiskEff, hin = ..grossContraint, ctr = ctr)
+
+  w <- .finalizeWeights(w, ctr)
   return(w)
 }
 
@@ -637,9 +750,11 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ## OUTPUTs w : vector (N x 1) weight
   n <- dim(Sigma)[1]
   ctr <- .ctrPortfolio(n, control)
-  Rho <- stats::cov2cor(Sigma) 
+  Rho <- stats::cov2cor(Sigma)
   if (ctr$constraint[1] == "none") {
-    tmp <- solve(Sigma, rep(1, n))
+    ## the maximum-decorrelation portfolio minimises w'Rw, not w'Sigma w:
+    ## solving with Sigma here returned the minimum-variance portfolio
+    tmp <- solve(Rho, rep(1, n))
     w <- tmp/sum(tmp)
   } else if (ctr$constraint[1] == "lo" || ctr$constraint[1] == "user") {
     dvec <- rep(0, n)
@@ -661,30 +776,24 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     {
       Rhow <- crossprod(Rho, w)
       g <- 2 * Rhow
-    }    
+    }
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
-    w <- nloptr::slsqp(x0 = ctr$w0, fn = .maxdec,
-                       gr = .gradmaxdec,
-                       hin = ..grossContraint, 
-                       heq = .eqConstraint,
-                       lower = ctr$LB,
-                       upper = ctr$UB,
-                       nl.info = FALSE,  control = ctr$ctr.slsqp)$par
+    ## convex problem: a single starting value is enough
+    w <- .slsqpBest(starts = list(ctr$w0), fn = .maxdec,
+                    gr = .gradmaxdec, hin = ..grossContraint, ctr = ctr)
   } else {
     # spotted in controls
   }
-  w[w<=ctr$LB] <- ctr$LB[w<=ctr$LB]
-  w[w>=ctr$UB] <- ctr$UB[w>=ctr$UB]
-  w <- w / sum(w)
+  w <- .finalizeWeights(w, ctr)
   return(w)
 }
 
-## Constraints used by the optimizers
+## Constraints used by the optimizers. Both are stated in the convention
+## required by nloptr >= 2.0.0, that is heq(w) == 0 and hin(w) <= 0.
 .eqConstraint <- function(w) {
   return(sum(w) - 1)
 }
 
-# DA here 1.6 is hard-coded, this should be changed
 .grossConstraint <- function(w, gross.c) {
-  return(gross.c - norm(as.matrix(w), type = "1"))
+  return(norm(as.matrix(w), type = "1") - gross.c)
 }

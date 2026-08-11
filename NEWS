@@ -1,6 +1,65 @@
+Changes in Version 2.1.8 (DA)
+  o optimalPortfolio(type = 'erc'): the equal-risk-contribution weights are now
+    obtained exactly for the 'none' and 'lo' constraints, by solving
+    y_i [Sigma y]_i = 1/N (Spinu, 2013), instead of minimising the squared
+    deviations of the risk contributions with a general-purpose optimizer. The
+    latter objective is not convex and has local minima on the boundary at which
+    entire blocks of assets are assigned a zero weight; those were returned
+    silently whenever the correlation matrix had sizeable negative entries.
+  o meanEstimation(type = 'bs'): the sample size used in the Bayes-Stein
+    shrinkage intensity was the number of assets instead of the number of
+    observations, so the estimator did not depend on the length of the sample
+    and over-shrunk toward the minimum-variance mean.
+  o optimalPortfolio(type = 'maxdec', constraint = 'none') solved the problem
+    with the covariance matrix instead of the correlation matrix, and therefore
+    returned the minimum-variance portfolio.
+  o optimalPortfolio(type = 'mv', constraint = 'none') is now the solution of
+    the mean-variance problem under the summability constraint. The weights used
+    to be rescaled in a way that cancelled 'gamma' altogether and flipped the
+    sign of the portfolio when 1'Sigma^-1 mu was negative.
+  o covEstimation(type = 'ewma') is now normalised: the recursion is started at
+    zero rather than at the sample covariance matrix, which used to inflate the
+    covariance by a factor (1 + lambda^T) -- 30% for T = 20.
+  o covEstimation(type = 'large') is an alias of 'lw'. The two estimators were
+    numerically identical up to the truncation of the shrinkage intensity to
+    [0, 1], which 'large' omitted.
+  o optimalPortfolio(type = 'riskeff') works for portfolios of fewer than ten
+    assets, and tolerates ties in the semideviations.
+  o The convergence status returned by slsqp is now inspected instead of being
+    discarded, and the non-convex problems are solved from several starting
+    values.
+  o The default ctr.slsqp gains ftol_rel = 1e-12. The previous default set only
+    xtol_rel = 1e-18, which is below double precision and can never be met, so
+    every gross-constrained problem ran to maxeval and reported a non-converged
+    status irrespective of whether it had converged. With an attainable
+    criterion the mean-variance problem with a gross constraint on 25 assets
+    stops after 126 iterations instead of 2000, and the solver's convergence
+    status becomes informative. The cost is confined to the 'gross' constraint,
+    where stopping on the objective rather than exhausting the budget can leave
+    up to about 2e-5 of relative objective on the table and move weights by up
+    to about 1e-3; pass a smaller ftol_rel, or drop it, to recover the previous
+    behaviour.
+  o 'gross.c' is validated (it was not, because the test was made on the wrong
+    variable), 'lambda' is required to lie in (0, 1), 'K' to be a positive
+    integer, and the dimensions of 'mu' and 'semiDev' are checked against Sigma.
+  o optimalPortfolio(type = 'invvol') projects its weights onto 'LB'/'UB' when
+    they bind, with a warning, instead of returning weights that violate them.
+  o 'LB' and 'UB' are validated whenever they are supplied, not only under the
+    'user' constraint: they are passed to the optimizer under 'gross' as well,
+    and bounds incompatible with the summability constraint are now rejected.
+  o The starting value is projected onto the bounds, so a feasible problem such
+    as constraint = 'gross' with LB = c(0.9, 0, 0, 0) no longer fails outright
+    because the equally-weighted default violates them.
+  o The returned weights are projected onto {LB <= w <= UB, w'1 = 1} rather than
+    clipped and rescaled, which could push a weight back outside the bounds it
+    had just been clipped into.
+  o The default risk aversion is 0.89, as documented (it was 0.8773).
+  o covEstimation(type = 'const' / 'diag' / 'factor') works for a single asset.
+  o CITATION uses bibentry(); MASS removed from Imports; documentation fixes.
+
 Changes in Version 2.1.7 (DA)
   o Doc fixes
-  
+
 Changes in Version 2.1.6 (DA)
   o Update references
   
