@@ -73,7 +73,7 @@ attains a zero objective. See Spinu (2013) and Chaves et al. (2012). This is
 necessary because the objective above is not convex and admits local minima on
 the boundary at which whole groups of assets receive a zero weight; a
 general-purpose optimizer started at the equally-weighted portfolio converges
-to them whenever the correlation matrix has sizeable negative entries. Under
+to them whenever the correlation matrix has sizable negative entries. Under
 \code{'user'} or \code{'gross'} constraints the problem is solved numerically
 from several starting values.
 
@@ -106,7 +106,7 @@ These portfolios are summarized in Ardia and Boudt (2015) and Ardia et al. (2017
 
 \item \code{constraint} constraint used for the optimization, among
 \code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to
-compute the unconstraint portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),
+compute the unconstrained portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),
 \code{'gross'} is the gross exposure constraint, and \code{'user'} is the set of user constraints (typically
 lower and upper boundaries). Default: \code{constraint = 'none'}. Note that the
 summability constraint is always imposed.

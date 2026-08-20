@@ -51,7 +51,7 @@
 #' necessary because the objective above is not convex and admits local minima on
 #' the boundary at which whole groups of assets receive a zero weight; a
 #' general-purpose optimizer started at the equally-weighted portfolio converges
-#' to them whenever the correlation matrix has sizeable negative entries. Under
+#' to them whenever the correlation matrix has sizable negative entries. Under
 #' \code{'user'} or \code{'gross'} constraints the problem is solved numerically
 #' from several starting values.
 #'
@@ -84,7 +84,7 @@
 #' 
 #' \item \code{constraint} constraint used for the optimization, among
 #' \code{'none'}, \code{'lo'}, \code{'gross'} and \code{'user'}, where: \code{'none'} is used to
-#' compute the unconstraint portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),
+#' compute the unconstrained portfolio, \code{'lo'} is the long-only constraints (non-negative weighted),
 #' \code{'gross'} is the gross exposure constraint, and \code{'user'} is the set of user constraints (typically
 #' lower and upper boundaries). Default: \code{constraint = 'none'}. Note that the
 #' summability constraint is always imposed.
@@ -615,7 +615,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ## boundary where a whole block of assets is dropped and the survivors are
   ## equalised at 1/(N - k), and slsqp started at the equally-weighted
   ## portfolio converges to one of them as soon as the correlation matrix has
-  ## sizeable negative entries.
+  ## sizable negative entries.
   if (ctr$constraint[1] == "none" || ctr$constraint[1] == "lo") {
     w <- .finalizeWeights(.ercExact(Sigma), ctr)
     .checkGross(w, ctr)

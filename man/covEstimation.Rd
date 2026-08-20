@@ -36,7 +36,7 @@ to compute the ewma covariance matrix:
 where \eqn{r_t} is the \eqn{(N \times 1)}{(N x 1)} vector of returns at time
 \eqn{t} and \eqn{\bar{r}}{rbar} the sample mean. The exponential weights are
 normalized by \eqn{1-\lambda^T}{1-lambda^T} so that they sum to one over the
-\eqn{T} available observations; the returns are centred. It is therefore the
+\eqn{T} available observations; the returns are centered. It is therefore the
 finite-sample, mean-corrected analogue of the RiskMetrics recursion
 \eqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda) r_t r_t'}{Sigma[t]
 := lambda * Sigma[t-1] + (1-lambda) r[t]r[t]'} started at zero, whose weights

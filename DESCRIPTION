@@ -1,6 +1,6 @@
 Package: RiskPortfolios
 Version: 2.1.8
-Date: 2026-08-10
+Date: 2026-08-19
 Title: Computation of Risk-Based Portfolios
 Authors@R: c(person("David", "Ardia", role = c("aut", "cre", "cph", "fnd"),
                      email = "david.ardia.ch@gmail.com", comment = c(ORCID = "0000-0003-2823-782X")),
@@ -12,6 +12,7 @@ Description: Collection of functions designed to compute risk-based portfolios a
     in Ardia et al. (2017) <doi:10.1007/s10479-017-2474-7> and Ardia et al. (2017) <doi:10.21105/joss.00171>.
 License: GPL (>= 2)
 Encoding: UTF-8
+Language: en-US
 BugReports: https://github.com/ArdiaD/RiskPortfolios/issues
 URL: https://github.com/ArdiaD/RiskPortfolios
 Suggests: testthat
