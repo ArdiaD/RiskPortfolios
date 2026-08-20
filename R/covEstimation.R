@@ -18,9 +18,13 @@
 #' \deqn{\Sigma := \frac{1-\lambda}{1-\lambda^T} \sum_{t=1}^{T} \lambda^{T-t} (r_t - \bar{r})(r_t - \bar{r})'}{Sigma
 #' := (1-lambda)/(1-lambda^T) sum_t lambda^(T-t) (r[t] - rbar)(r[t] - rbar)'}
 #' where \eqn{r_t} is the \eqn{(N \times 1)}{(N x 1)} vector of returns at time
-#' \eqn{t}. The weights sum to one, so the estimator is the finite-sample
-#' counterpart of the recursion \eqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda) r_t r_t'}{Sigma[t]
-#' := lambda * Sigma[t-1] + (1-lambda) r[t]r[t]'} started at zero.
+#' \eqn{t} and \eqn{\bar{r}}{rbar} the sample mean. The exponential weights are
+#' normalized by \eqn{1-\lambda^T}{1-lambda^T} so that they sum to one over the
+#' \eqn{T} available observations; the returns are centred. It is therefore the
+#' finite-sample, mean-corrected analogue of the RiskMetrics recursion
+#' \eqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda) r_t r_t'}{Sigma[t]
+#' := lambda * Sigma[t-1] + (1-lambda) r[t]r[t]'} started at zero, whose weights
+#' sum to \eqn{1-\lambda^T}{1-lambda^T} rather than to one.
 #' Note that the data must be sorted from the oldest to the latest. See RiskMetrics (1996)
 #'
 #' \code{'factor'} is used to compute the covariance matrix estimation using a
@@ -53,8 +57,12 @@
 #' minimize the quadratic loss measured by the Frobenius norm, and is valid as
 #' the number of variables and/or the number of observations go to infinity;
 #' Monte-Carlo simulations show that it works well for values as low as 10. The
-#' main advantage is that the estimator is guaranteed to be invertible and
-#' well-conditioned even if variables outnumber observations.
+#' shrinkage generally improves the conditioning of the estimate when variables
+#' outnumber observations, but it does not guarantee invertibility: the
+#' estimated intensity is truncated to \eqn{[0, 1]}{[0, 1]} and can be zero, in
+#' which case the sample covariance matrix is returned unchanged and is singular
+#' whenever \eqn{T \le N}{T <= N}. The same caveat applies to \code{'cor'},
+#' \code{'diag'} and \code{'oneparm'}.
 #' See Ledoit and Wolf (2003, 2004).
 #'
 #' \code{'bs'} is the Bayes-Stein estimator for the covariance matrix given by
@@ -62,8 +70,9 @@
 #'
 #' Default: \code{type = 'naive'}.
 #'
-#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
-#' Default: \code{lambda = 0.94}.
+#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}. It is
+#' excluded at one because the normalization by \eqn{1-\lambda^T}{1-lambda^T}
+#' would divide by zero. Default: \code{lambda = 0.94}.
 #'
 #' \item \code{K} number of factors to use when the K-factor approach is
 #' chosen to estimate the covariance matrix. Default: \code{K = 1}.}
@@ -145,9 +154,7 @@ covEstimation <- function(rets, control = list()) {
   if (missing(rets)) {
     stop("rets is missing")
   }
-  if (!is.matrix(rets)) {
-    stop("rets must be a (T x N) matrix")
-  }
+  .checkReturns(rets)
   
   ctr <- .ctrCov(control)
   
@@ -240,6 +247,10 @@ covEstimation <- function(rets, control = list()) {
   n <- dim(rets)[2]
   tmpMat <- matrix(rep(1, n^2), ncol = n)
 
+  if (any(apply(rets, 2, sd) <= 0)) {
+    stop("'const' requires every asset to have a strictly positive variance; ",
+         "the correlations of a constant series are undefined")
+  }
   rho <- if (n > 1) mean(cor(rets)[lower.tri(tmpMat, diag = FALSE)]) else 0
   R <- rho * tmpMat
   diag(R) <- 1
@@ -290,6 +301,11 @@ covEstimation <- function(rets, control = list()) {
     varmkt <- as.numeric(smple[n + 1, n + 1])
     smple <- smple[-(n + 1), -(n + 1), drop = FALSE]
     
+    if (!is.finite(varmkt) || varmkt <= 0) {
+      stop("the equally-weighted market factor has zero variance, so the ",
+           "one-factor shrinkage target of 'lw'/'large' is undefined; use ",
+           "another 'type' (for instance 'cor', 'diag' or 'oneparm')")
+    }
     prior <- outer(covmkt, covmkt)/varmkt
     diag(prior) <- diag(smple)
     
@@ -373,6 +389,10 @@ covEstimation <- function(rets, control = list()) {
   y <- lwCovElement$y
   smple <- lwCovElement$smple
   var <- diag(smple)
+  if (any(var <= 0)) {
+    stop("'cor' requires every asset to have a strictly positive variance; ",
+         "the correlations of a constant series are undefined")
+  }
   sqrtvar <- sqrt(var)
   outerSqrtVar <- outer(sqrtvar, sqrtvar)
   
@@ -479,10 +499,14 @@ covEstimation <- function(rets, control = list()) {
   ## Allocation Strategies
   t <- dim(rets)[1]
   n <- dim(rets)[2]
+  if (t <= n) {
+    stop("the Bayes-Stein estimator inverts the sample covariance matrix and ",
+         "so requires more observations than assets (T > N)")
+  }
 
   mu <- colMeans(rets)
   Sigma <- cov(rets)
-  invSigma <- solve(Sigma)
+  invSigma <- .solveOrStop(Sigma)
 
   i <- rep(1, n)
   invSigmai <- crossprod(invSigma, i)

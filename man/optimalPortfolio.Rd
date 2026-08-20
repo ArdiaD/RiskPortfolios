@@ -31,6 +31,12 @@ components:
 optimal portfolio, among \code{'mv'}, \code{'minvol'}, \code{'invvol'},
 \code{'erc'}, \code{'maxdiv'}, \code{'riskeff'} and \code{'maxdec'} where: 
 
+Every supplied bound enters the optimization itself. Under the \code{'gross'}
+constraint the mean-variance, minimum-variance and maximum-decorrelation
+problems are recast as quadratic programs in \eqn{(w^+, w^-)}{(w+, w-)} with
+\eqn{w = w^+ - w^-}{w = w+ - w-}, which turns \eqn{\|w\|_1 \le c}{||w||_1 <= c}
+into a linear constraint and makes them exactly solvable.
+
 \code{'mv'} is used to compute the weights of the mean-variance portfolio, that
 is the solution of \deqn{\max_w \left\{ w' \mu - \frac{\gamma}{2} w' \Sigma w \right\}
 \quad s.t. \quad w'1 = 1}{max_w {w'mu - gamma/2 w'Sigma w} s.t. w'1 = 1}
@@ -77,10 +83,18 @@ from several starting values.
 
 \code{'riskeff'} is used to compute the weights of the risk-efficient
 portfolio: \deqn{w = {argmax}\left\{ \frac{w' J \xi}{ \sqrt{w' \Sigma w}
-}\right\} }{w = argmax ( w'J \xi)\sqrt(w'\Sigma w)} where \eqn{J} is a
+}\right\} }{w = argmax (w'J xi) / sqrt(w'Sigma w)} where \eqn{J} is a
 \eqn{(N \times 10)}{(N x 10)} matrix of zeros whose \eqn{(i,j)}-th element
 is one if the semi-deviation of stock \eqn{i} belongs to decile
-\eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}. 
+\eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}.
+
+Note that this portfolio carries additional bounds that stabilize the
+optimization: whenever \code{LB} (resp. \code{UB}) is not supplied it is set
+to \eqn{1/(2N)}{1/(2N)} (resp. \eqn{2/N}{2/N}), under every value of
+\code{constraint}. The risk-efficient portfolio is therefore never the
+summability-only problem, it is always long-only, and \code{gross.c} can
+never bind on it since \eqn{\|w\|_1 = 1}{||w||_1 = 1}. Supply \code{LB} and
+\code{UB} explicitly to override these defaults. 
 
 \code{'maxdec'} is used to compute the weights of the maximum-decorrelation
 portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' R w} \right\}
@@ -120,11 +134,12 @@ Default: \code{gamma = 0.89}.
 \code{list(xtol_rel = 1e-18, ftol_rel = 1e-12, check_derivatives = FALSE,
 maxeval = 2000)}. \code{xtol_rel} is below double precision and so cannot be
 met on its own; \code{ftol_rel} supplies an attainable stopping criterion, and
-the optimizer warns if it stops on \code{maxeval} instead of converging. Under
-the \code{'gross'} constraint, stopping on \code{ftol_rel} rather than
-exhausting the budget can leave up to about \eqn{2 \times 10^{-5}}{2e-5} of
-relative objective on the table; pass a smaller \code{ftol_rel} if that
-matters more than the runtime.
+the optimizer warns if it stops on \code{maxeval} instead of converging. It is
+used only by the non-convex problems -- \code{'erc'} under \code{'user'} or
+\code{'gross'} constraints, \code{'maxdiv'} and \code{'riskeff'}. The
+mean-variance, minimum-variance and maximum-decorrelation portfolios are
+quadratic programs under every constraint, including \code{'gross'}, and are
+solved exactly by \code{\link[quadprog]{solve.QP}}.
 }
 }
 \examples{

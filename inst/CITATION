@@ -7,12 +7,13 @@ bibentry(bibtype = "Article",
               person("Jean-Philippe", "Gagnon-Fleury")),
   journal = "Journal of Open Source Software",
   year    = "2017",
-  volume  = "10",
-  number  = "2",
+  volume  = "2",
+  number  = "10",
+  pages   = "171",
   doi     = "10.21105/joss.00171",
   textVersion = paste("Ardia, D. Boudt, K., Gagnon-Fleury, J.-P. (2017).",
                "'RiskPortfolios': Computation of risk-based portfolios in 'R'.",
-               "Journal of Open Source Software 10(2).",
+               "Journal of Open Source Software 2(10), 171.",
                 "doi:10.21105/joss.00171")
 )
 

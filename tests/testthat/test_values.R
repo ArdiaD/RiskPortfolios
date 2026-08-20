@@ -234,3 +234,153 @@ test_that("a single asset does not break the estimators", {
     expect_equal(optimalPortfolio(Sigma = Sigma, control = list(type = ty)), 1)
   }
 })
+
+test_that("erc converges on ill-conditioned covariance matrices", {
+  ## a spread of eigenvalues plus strong negative correlations: the coordinate
+  ## descent needs several thousand sweeps here, and a fixed budget of a
+  ## thousand used to return risk contributions differing by 28 points
+  set.seed(99)
+  N = 7
+  Q = qr.Q(qr(matrix(rnorm(N * N), N, N)))
+  Sigma = Q %*% diag(exp(seq(0, log(8777), length.out = N))) %*% t(Q)
+  w = optimalPortfolio(Sigma = Sigma, control = list(type = 'erc', constraint = 'lo'))
+  expect_equal(f.pRC(w, Sigma), rep(1/N, N), tolerance = 1e-07)
+
+  ## and across ordinary sample covariance matrices
+  set.seed(3)
+  for (k in 1:40) {
+    N = sample(c(5, 10, 20), 1)
+    X = matrix(rnorm(120 * N), ncol = N) %*% (matrix(rnorm(N * N), N, N)/sqrt(N))
+    S = covEstimation(X)
+    w = optimalPortfolio(Sigma = S, control = list(type = 'erc', constraint = 'lo'))
+    expect_equal(f.pRC(w, S), rep(1/N, N), tolerance = 1e-07)
+  }
+})
+
+test_that("the gross exposure of the returned weights is enforced", {
+  ## a starting value that itself breaks the gross budget, with a truncated
+  ## budget, used to be handed straight back
+  S = diag(c(1, 2))
+  w = suppressWarnings(optimalPortfolio(Sigma = S, mu = c(0.1, 0.2),
+        control = list(type = 'mv', constraint = 'gross', gross.c = 1.2,
+                       w0 = c(10, -9), ctr.slsqp = list(maxeval = 1))))
+  expect_true(sum(abs(w)) <= 1.2 + 1e-06)
+  expect_equal(sum(w), 1, tolerance = 1e-08)
+})
+
+test_that("lambda = 1 is accepted where it is meaningful", {
+  set.seed(123)
+  rets = matrix(rnorm(200 * 5), ncol = 5)
+  ## no decay: equal weights, i.e. the arithmetic mean
+  expect_equal(meanEstimation(rets, control = list(type = 'ewma', lambda = 1)),
+               colMeans(rets))
+  expect_equal(semidevEstimation(rets, control = list(type = 'ewma', lambda = 1)),
+               semidevEstimation(rets))
+  ## but the ewma covariance divides by 1 - lambda^T
+  expect_error(covEstimation(rets, control = list(type = 'ewma', lambda = 1)))
+})
+
+test_that("non-finite and degenerate inputs are rejected", {
+  set.seed(123)
+  rets = matrix(rnorm(100 * 4), ncol = 4)
+  Sigma = covEstimation(rets)
+  bad = rets; bad[1, 1] = NA
+  expect_error(covEstimation(bad))
+  expect_error(meanEstimation(bad))
+  expect_error(semidevEstimation(bad))
+  expect_error(covEstimation(matrix(rnorm(4), nrow = 1)))
+  Sinf = Sigma; Sinf[1, 2] = Sinf[2, 1] = Inf
+  expect_error(optimalPortfolio(Sigma = Sinf, control = list(type = 'minvol')))
+  expect_error(optimalPortfolio(Sigma = diag(c(0, 1, 2, 3)), control = list(type = 'invvol')))
+  expect_error(optimalPortfolio(mu = meanEstimation(rets), Sigma = Sigma,
+                                control = list(type = 'mv', gamma = c(1, 2))))
+  expect_error(optimalPortfolio(mu = c(NA, 0, 0, 0), Sigma = Sigma,
+                                control = list(type = 'mv')))
+})
+
+test_that("Sigma must be a covariance matrix", {
+  ## indefinite: 'minimum variance' is unbounded below on the feasible set
+  S = matrix(c(1, 2, 2, 1), 2)
+  for (ty in c('minvol', 'mv', 'erc', 'maxdiv', 'maxdec', 'invvol')) {
+    expect_error(optimalPortfolio(S, mu = c(0.1, 0.2), control = list(type = ty)))
+  }
+  ## singular but positive semidefinite input is admissible in general ...
+  set.seed(2)
+  Ssing = covEstimation(matrix(rnorm(2 * 10), nrow = 2), control = list(type = 'lw'))
+  expect_silent(optimalPortfolio(Ssing, control = list(type = 'invvol')))
+  ## ... but the diversification ratio has no maximum over an unbounded set
+  expect_error(optimalPortfolio(Ssing, control = list(type = 'maxdiv')))
+  expect_error(optimalPortfolio(Ssing, control = list(type = 'maxdiv', constraint = 'lo')),
+               NA)
+})
+
+test_that("supplied bounds enter the optimization, not a projection afterwards", {
+  S = diag(c(1, 4, 9))
+  UB = c(0.4, 0.8, 0.8)
+  ref = quadprog::solve.QP(S, rep(0, 3), cbind(rep(1, 3), diag(3), -diag(3)),
+                           c(1, rep(0, 3), -UB), meq = 1)$solution
+  for (cst in c('lo', 'none', 'user')) {
+    ct = list(type = 'minvol', constraint = cst, UB = UB)
+    if (cst == 'user') ct$LB = rep(0, 3)
+    w = optimalPortfolio(S, control = ct)
+    expect_equal(as.numeric(t(w) %*% S %*% w), as.numeric(t(ref) %*% S %*% ref),
+                 tolerance = 1e-08)
+  }
+})
+
+test_that("the gross-constrained quadratic programs are solved exactly", {
+  ## split w = p - n: sum(p + n) <= c is an exact reformulation of ||w||_1 <= c
+  exact = function(Q, lin, c, ridge = 1e-11) {
+    N = ncol(Q); Z = cbind(diag(N), -diag(N))
+    D = t(Z) %*% Q %*% Z + ridge * diag(2 * N)
+    A = cbind(c(rep(1, N), rep(-1, N)), -rep(1, 2 * N), diag(2 * N))
+    s = quadprog::solve.QP(D, as.numeric(t(Z) %*% lin), A,
+                           c(1, -c, rep(0, 2 * N)), meq = 1)$solution
+    s[1:N] - s[(N + 1):(2 * N)]
+  }
+  set.seed(123)
+  rets = matrix(rnorm(100 * 25), 100, 25)
+  mu = meanEstimation(rets); Sigma = covEstimation(rets)
+  fmv = function(w) -sum(mu * w) + 0.5 * 0.89 * as.numeric(crossprod(w, Sigma %*% w))
+  for (gc in c(1.2, 1.6)) {
+    w = optimalPortfolio(mu = mu, Sigma = Sigma,
+                         control = list(type = 'mv', constraint = 'gross', gross.c = gc))
+    expect_true(fmv(w) <= fmv(exact(0.89 * Sigma, mu, gc)) + 1e-09)
+    expect_true(sum(abs(w)) <= gc + 1e-06)
+  }
+})
+
+test_that("degenerate covariance inputs are reported, not silently returned", {
+  ## a market factor with zero variance leaves the one-factor target undefined
+  X = cbind(1:10, -(1:10))
+  expect_error(covEstimation(X, control = list(type = 'lw')))
+  expect_error(covEstimation(X, control = list(type = 'large')))
+  expect_error(covEstimation(X, control = list(type = 'cor')), NA)
+  ## a constant asset has no correlation with anything
+  Y = cbind(rep(1, 10), 1:10)
+  expect_error(covEstimation(Y, control = list(type = 'const')))
+  expect_error(covEstimation(Y, control = list(type = 'cor')))
+  expect_error(covEstimation(Y, control = list(type = 'naive')), NA)
+  ## Bayes-Stein needs T > N
+  set.seed(1)
+  expect_error(meanEstimation(matrix(rnorm(15), 3, 5), control = list(type = 'bs')),
+               "more observations than assets")
+  expect_error(covEstimation(matrix(rnorm(15), 3, 5), control = list(type = 'bs')),
+               "more observations than assets")
+  ## a semideviation cannot be negative
+  expect_error(optimalPortfolio(diag(3), semiDev = c(-1, 0, 1),
+                                control = list(type = 'riskeff')))
+})
+
+test_that("the ewma semideviation does not underflow on long samples", {
+  X = matrix(c(-1, rep(1, 999)), ncol = 1)
+  expect_true(is.finite(semidevEstimation(X, control = list(type = 'ewma', lambda = 0.1))))
+  ## and the ordinary case is unchanged
+  set.seed(4)
+  Xr = matrix(rnorm(500 * 3), ncol = 3)
+  ref = sapply(1:3, function(j) {
+    x = Xr[, j]; i = x < mean(x); w = 0.94^(500:1)[i]
+    sqrt(sum(w/sum(w) * (x[i] - mean(x))^2))
+  })
+  expect_equal(semidevEstimation(Xr, control = list(type = 'ewma', lambda = 0.94)), ref)
+})

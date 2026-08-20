@@ -1,15 +1,80 @@
 ## Internal helpers shared by the estimation and optimization functions.
 ## Not exported, not documented.
 
-.checkLambda <- function(lambda) {
-  ## Decay parameter of the exponential weighting schemes. lambda = 1 would
-  ## divide by zero in the finite-sample ewma normalization and lambda = 0
-  ## gives a degenerate (all-zero) weight vector.
-  if (!is.numeric(lambda) || length(lambda) != 1L || !is.finite(lambda) ||
-      lambda <= 0 || lambda >= 1) {
-    stop("'lambda' must be a single number in (0, 1)")
+.checkLambda <- function(lambda, allowOne = FALSE) {
+  ## Decay parameter of the exponential weighting schemes. lambda = 0 gives a
+  ## degenerate (all-zero) weight vector everywhere. lambda = 1 is the no-decay
+  ## limit: it is a legitimate request for the mean and the semideviation, where
+  ## it yields equal weights, but it divides by zero in the finite-sample
+  ## normalisation (1 - lambda^T) of the ewma covariance.
+  ok <- is.numeric(lambda) && length(lambda) == 1L && is.finite(lambda) &&
+    lambda > 0 && (lambda < 1 || (allowOne && lambda == 1))
+  if (!ok) {
+    stop("'lambda' must be a single number in (0, 1", if (allowOne) "]" else ")")
   }
   invisible(lambda)
+}
+
+.checkReturns <- function(rets) {
+  ## Shared validation of the (T x N) return matrix. Non-finite entries used to
+  ## propagate silently into an all-NA covariance matrix and on into the
+  ## optimizers.
+  if (!is.matrix(rets)) {
+    stop("rets must be a (T x N) matrix")
+  }
+  if (!is.numeric(rets)) {
+    stop("rets must be a numeric matrix")
+  }
+  if (nrow(rets) < 2L || ncol(rets) < 1L) {
+    stop("rets must have at least two rows and one column")
+  }
+  if (any(!is.finite(rets))) {
+    stop("rets must not contain missing or infinite values")
+  }
+  invisible(rets)
+}
+
+.checkPSD <- function(Sigma) {
+  ## A covariance matrix must be positive semidefinite. Without this, an
+  ## indefinite matrix is accepted and, for instance, "minimum variance" is
+  ## reported for a problem whose objective is unbounded below.
+  ## Returns TRUE when Sigma is positive definite, FALSE when it is singular
+  ## but admissible; the Cholesky attempt makes the usual case cheap.
+  if (!inherits(try(chol(Sigma), silent = TRUE), "try-error")) {
+    return(TRUE)
+  }
+  ev <- eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values
+  scale <- max(abs(ev))
+  tol <- 8 * ncol(Sigma) * max(scale, 1) * .Machine$double.eps
+  if (min(ev) < -tol) {
+    stop("Sigma is not positive semidefinite (smallest eigenvalue ",
+         format(min(ev), digits = 3), "); it cannot be a covariance matrix")
+  }
+  return(FALSE)
+}
+
+.requirePD <- function(Sigma, what) {
+  ## Objectives of the form (w'a) / sqrt(w'Sigma w) are unbounded over an
+  ## unbounded feasible set as soon as Sigma is singular: any direction z with
+  ## Sigma z = 0 drives the ratio to infinity. Refuse rather than return the
+  ## enormous weights the optimizer wanders off to.
+  if (inherits(try(chol(Sigma), silent = TRUE), "try-error")) {
+    stop(what, " is unbounded when Sigma is singular; supply 'LB'/'UB' or the ",
+         "'gross' constraint to bound the problem, or use a non-singular ",
+         "covariance estimate")
+  }
+  invisible(TRUE)
+}
+
+.solveOrStop <- function(Sigma) {
+  ## solve() reports a raw LAPACK message on a singular sample covariance
+  ## matrix, which does not tell the caller what to do about it
+  out <- try(solve(Sigma), silent = TRUE)
+  if (inherits(out, "try-error")) {
+    stop("the sample covariance matrix is singular or ill-conditioned and ",
+         "cannot be inverted; the assets are collinear or the sample is too short")
+  }
+  return(out)
 }
 
 .shrinkage <- function(num, gamma, t) {
@@ -156,4 +221,21 @@
             "constraint; they have been projected onto them")
   }
   return(wp)
+}
+
+.checkGross <- function(w, ctr) {
+  ## The gross exposure is a nonlinear constraint handed to the optimizer, and
+  ## nothing downstream re-imposes it. A solution that leaves the optimizer
+  ## violating it -- for instance because the run was truncated -- must not be
+  ## returned as if it were admissible.
+  if (ctr$constraint[1] != "gross") {
+    return(invisible(w))
+  }
+  gross <- sum(abs(w))
+  if (gross > ctr$gross.c * (1 + 1e-06) + 1e-08) {
+    stop("the optimizer returned a portfolio with gross exposure ", format(gross, digits = 6),
+         ", above the requested gross.c = ", format(ctr$gross.c),
+         "; the optimization did not converge to an admissible portfolio")
+  }
+  invisible(w)
 }

@@ -46,7 +46,8 @@ close to \eqn{\sqrt{2}}{sqrt(2)} for symmetric returns.
 
 Default: \code{type = 'naive'}.
 
-\item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+\item \code{lambda} decay parameter, a single number in \eqn{(0, 1]}{(0, 1]};
+\eqn{\lambda = 1}{lambda = 1} is the no-decay limit and gives equal weights.
 Default: \code{lambda = 0.94}.
 }
 }

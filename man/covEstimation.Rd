@@ -34,9 +34,13 @@ to compute the ewma covariance matrix:
 \deqn{\Sigma := \frac{1-\lambda}{1-\lambda^T} \sum_{t=1}^{T} \lambda^{T-t} (r_t - \bar{r})(r_t - \bar{r})'}{Sigma
 := (1-lambda)/(1-lambda^T) sum_t lambda^(T-t) (r[t] - rbar)(r[t] - rbar)'}
 where \eqn{r_t} is the \eqn{(N \times 1)}{(N x 1)} vector of returns at time
-\eqn{t}. The weights sum to one, so the estimator is the finite-sample
-counterpart of the recursion \eqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda) r_t r_t'}{Sigma[t]
-:= lambda * Sigma[t-1] + (1-lambda) r[t]r[t]'} started at zero.
+\eqn{t} and \eqn{\bar{r}}{rbar} the sample mean. The exponential weights are
+normalized by \eqn{1-\lambda^T}{1-lambda^T} so that they sum to one over the
+\eqn{T} available observations; the returns are centred. It is therefore the
+finite-sample, mean-corrected analogue of the RiskMetrics recursion
+\eqn{\Sigma_t := \lambda \Sigma_{t-1} + (1-\lambda) r_t r_t'}{Sigma[t]
+:= lambda * Sigma[t-1] + (1-lambda) r[t]r[t]'} started at zero, whose weights
+sum to \eqn{1-\lambda^T}{1-lambda^T} rather than to one.
 Note that the data must be sorted from the oldest to the latest. See RiskMetrics (1996)
 
 \code{'factor'} is used to compute the covariance matrix estimation using a
@@ -69,8 +73,12 @@ The shrinkage intensity of the market-prior estimator is derived so as to
 minimize the quadratic loss measured by the Frobenius norm, and is valid as
 the number of variables and/or the number of observations go to infinity;
 Monte-Carlo simulations show that it works well for values as low as 10. The
-main advantage is that the estimator is guaranteed to be invertible and
-well-conditioned even if variables outnumber observations.
+shrinkage generally improves the conditioning of the estimate when variables
+outnumber observations, but it does not guarantee invertibility: the
+estimated intensity is truncated to \eqn{[0, 1]}{[0, 1]} and can be zero, in
+which case the sample covariance matrix is returned unchanged and is singular
+whenever \eqn{T \le N}{T <= N}. The same caveat applies to \code{'cor'},
+\code{'diag'} and \code{'oneparm'}.
 See Ledoit and Wolf (2003, 2004).
 
 \code{'bs'} is the Bayes-Stein estimator for the covariance matrix given by
@@ -78,8 +86,9 @@ Jorion (1986).
 
 Default: \code{type = 'naive'}.
 
-\item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
-Default: \code{lambda = 0.94}.
+\item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}. It is
+excluded at one because the normalization by \eqn{1-\lambda^T}{1-lambda^T}
+would divide by zero. Default: \code{lambda = 0.94}.
 
 \item \code{K} number of factors to use when the K-factor approach is
 chosen to estimate the covariance matrix. Default: \code{K = 1}.}

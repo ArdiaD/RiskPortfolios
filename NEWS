@@ -34,13 +34,11 @@ Changes in Version 2.1.8 (DA)
     status irrespective of whether it had converged. With an attainable
     criterion the mean-variance problem with a gross constraint on 25 assets
     stops after 126 iterations instead of 2000, and the solver's convergence
-    status becomes informative. The cost is confined to the 'gross' constraint,
-    where stopping on the objective rather than exhausting the budget can leave
-    up to about 2e-5 of relative objective on the table and move weights by up
-    to about 1e-3; pass a smaller ftol_rel, or drop it, to recover the previous
-    behaviour.
+    status becomes informative. It now applies only to the non-convex problems
+    ('erc' under bounds, 'maxdiv' and 'riskeff'), the convex ones having been
+    moved to an exact quadratic program.
   o 'gross.c' is validated (it was not, because the test was made on the wrong
-    variable), 'lambda' is required to lie in (0, 1), 'K' to be a positive
+    variable), 'lambda' is validated, 'K' required to be a positive
     integer, and the dimensions of 'mu' and 'semiDev' are checked against Sigma.
   o optimalPortfolio(type = 'invvol') projects its weights onto 'LB'/'UB' when
     they bind, with a warning, instead of returning weights that violate them.
@@ -54,7 +52,64 @@ Changes in Version 2.1.8 (DA)
     clipped and rescaled, which could push a weight back outside the bounds it
     had just been clipped into.
   o The default risk aversion is 0.89, as documented (it was 0.8773).
-  o covEstimation(type = 'const' / 'diag' / 'factor') works for a single asset.
+  o covEstimation(type = 'const' / 'diag') works for a single asset. The factor
+    estimator still requires at least three assets, as factanal() does.
+  o The equal-risk-contribution solver now measures convergence on its defining
+    condition, y_i [Sigma y]_i = 1/N, relative to that target, and warns if it
+    is not met. It previously stopped on the size of the last step, normalised
+    by the largest component of y, and gave up after a thousand sweeps: on
+    ill-conditioned covariance matrices -- about 1% of ordinary sample
+    covariance matrices -- it returned risk contributions differing by several
+    percentage points without any indication, and on the worst cases it was
+    less accurate than the optimizer it replaced.
+  o The gross exposure of the returned weights is verified, and the starting
+    value is required to respect the gross budget. A truncated optimization
+    could otherwise hand back a portfolio violating gross.c.
+  o meanEstimation() and semidevEstimation() accept lambda = 1 again, the
+    no-decay limit that gives equal weights; 2.1.8-dev had wrongly excluded it
+    for all three estimators, although only the ewma covariance divides by
+    1 - lambda^T.
+  o The returns matrix is validated: non-finite entries used to propagate
+    silently into an all-NA covariance matrix and on into the optimizers.
+    optimalPortfolio() likewise requires finite Sigma, mu and semiDev, and
+    invvol requires strictly positive variances instead of returning NaN.
+  o 'gamma' must be a single positive number, as documented.
+  o Documentation: the risk-efficient portfolio's stabilizing bounds of
+    1/(2N) and 2/N are now documented, including the fact that they apply
+    under every constraint and make gross.c inoperative for that portfolio;
+    the invertibility of the shrinkage estimators is no longer overstated;
+    the ewma formula and its prose agree; the plain-text rendering of the
+    risk-efficient objective divides rather than multiplies; the JOSS
+    reference is corrected to 2(10), 171.
+  o Every supplied bound now enters the optimization. 'LB'/'UB' passed together
+    with constraint = 'lo' or 'none' used to be left out of the quadratic
+    program and applied afterwards by projecting its solution onto the box,
+    which restores feasibility but does not minimise the objective: minimum
+    variance on diag(1, 4, 9) with UB = c(.4, .8, .8) returned variance
+    1.210779 where the bounded program gives 1.156923.
+  o The mean-variance, minimum-variance and maximum-decorrelation portfolios
+    under the 'gross' constraint are now solved exactly as quadratic programs,
+    by splitting w into positive and negative parts so that the gross budget
+    becomes linear. They were handed to a nonlinear optimizer that had no
+    attainable stopping criterion on them, and stopped up to 1e-6 short of the
+    optimum after exhausting its evaluation budget.
+  o Sigma is required to be positive semidefinite. An indefinite matrix used to
+    be accepted, so that 'minimum variance' was reported for a problem whose
+    objective is unbounded below.
+  o The maximum-diversification portfolio is refused when Sigma is singular and
+    nothing bounds the weights: the diversification ratio has no maximum there,
+    and the optimizer used to return weights of order 1e5 without saying so.
+  o covEstimation(type = 'lw' / 'large') reports the degenerate case in which
+    the equally-weighted market factor has zero variance, instead of returning
+    NaN off-diagonal entries. covEstimation(type = 'const' / 'cor') likewise
+    reports assets with zero variance rather than returning NA/NaN.
+  o The Bayes-Stein estimators state their T > N requirement and report a
+    singular sample covariance matrix in their own terms instead of passing on
+    a LAPACK message.
+  o The ewma semideviation weights are computed on the log scale, rebased on
+    the newest selected observation: lambda^T underflowed to zero on a long
+    sample and the selected weights then normalised to 0/0.
+  o 'semiDev' must be non-negative.
   o CITATION uses bibentry(); MASS removed from Imports; documentation fixes.
 
 Changes in Version 2.1.7 (DA)

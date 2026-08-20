@@ -9,6 +9,12 @@
 #' optimal portfolio, among \code{'mv'}, \code{'minvol'}, \code{'invvol'},
 #' \code{'erc'}, \code{'maxdiv'}, \code{'riskeff'} and \code{'maxdec'} where: 
 #' 
+#' Every supplied bound enters the optimization itself. Under the \code{'gross'}
+#' constraint the mean-variance, minimum-variance and maximum-decorrelation
+#' problems are recast as quadratic programs in \eqn{(w^+, w^-)}{(w+, w-)} with
+#' \eqn{w = w^+ - w^-}{w = w+ - w-}, which turns \eqn{\|w\|_1 \le c}{||w||_1 <= c}
+#' into a linear constraint and makes them exactly solvable.
+#'
 #' \code{'mv'} is used to compute the weights of the mean-variance portfolio, that
 #' is the solution of \deqn{\max_w \left\{ w' \mu - \frac{\gamma}{2} w' \Sigma w \right\}
 #' \quad s.t. \quad w'1 = 1}{max_w {w'mu - gamma/2 w'Sigma w} s.t. w'1 = 1}
@@ -55,10 +61,18 @@
 #' 
 #' \code{'riskeff'} is used to compute the weights of the risk-efficient
 #' portfolio: \deqn{w = {argmax}\left\{ \frac{w' J \xi}{ \sqrt{w' \Sigma w}
-#' }\right\} }{w = argmax ( w'J \xi)\sqrt(w'\Sigma w)} where \eqn{J} is a
+#' }\right\} }{w = argmax (w'J xi) / sqrt(w'Sigma w)} where \eqn{J} is a
 #' \eqn{(N \times 10)}{(N x 10)} matrix of zeros whose \eqn{(i,j)}-th element
 #' is one if the semi-deviation of stock \eqn{i} belongs to decile
-#' \eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}. 
+#' \eqn{j},\eqn{\xi = (\xi_1,\ldots,\xi_{10})'}.
+#'
+#' Note that this portfolio carries additional bounds that stabilize the
+#' optimization: whenever \code{LB} (resp. \code{UB}) is not supplied it is set
+#' to \eqn{1/(2N)}{1/(2N)} (resp. \eqn{2/N}{2/N}), under every value of
+#' \code{constraint}. The risk-efficient portfolio is therefore never the
+#' summability-only problem, it is always long-only, and \code{gross.c} can
+#' never bind on it since \eqn{\|w\|_1 = 1}{||w||_1 = 1}. Supply \code{LB} and
+#' \code{UB} explicitly to override these defaults. 
 #' 
 #' \code{'maxdec'} is used to compute the weights of the maximum-decorrelation
 #' portfolio: \deqn{w = {argmax}\left\{ 1 -  \sqrt{w' R w} \right\}
@@ -98,11 +112,12 @@
 #' \code{list(xtol_rel = 1e-18, ftol_rel = 1e-12, check_derivatives = FALSE,
 #' maxeval = 2000)}. \code{xtol_rel} is below double precision and so cannot be
 #' met on its own; \code{ftol_rel} supplies an attainable stopping criterion, and
-#' the optimizer warns if it stops on \code{maxeval} instead of converging. Under
-#' the \code{'gross'} constraint, stopping on \code{ftol_rel} rather than
-#' exhausting the budget can leave up to about \eqn{2 \times 10^{-5}}{2e-5} of
-#' relative objective on the table; pass a smaller \code{ftol_rel} if that
-#' matters more than the runtime.
+#' the optimizer warns if it stops on \code{maxeval} instead of converging. It is
+#' used only by the non-convex problems -- \code{'erc'} under \code{'user'} or
+#' \code{'gross'} constraints, \code{'maxdiv'} and \code{'riskeff'}. The
+#' mean-variance, minimum-variance and maximum-decorrelation portfolios are
+#' quadratic programs under every constraint, including \code{'gross'}, and are
+#' solved exactly by \code{\link[quadprog]{solve.QP}}.
 #' }
 #'
 #' @param Sigma a \eqn{(N \times N)}{(N x N)} covariance matrix.
@@ -295,16 +310,27 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (!is.matrix(Sigma)) {
     stop("Sigma must be a matrix")
   }
+  if (!is.numeric(Sigma) || any(!is.finite(Sigma))) {
+    stop("Sigma must be numeric and must not contain missing or infinite values")
+  }
   if (!isSymmetric(Sigma)) {
     stop("Sigma must be a symmetric matrix")
   }
+  if (any(diag(Sigma) < 0)) {
+    stop("Sigma must have non-negative diagonal entries")
+  }
+  .checkPSD(Sigma)
 
   n = dim(Sigma)[1]
-  if (!is.null(mu) && length(mu) != n) {
-    stop("mu must be of the same dimension as Sigma")
+  if (!is.null(mu) && (length(mu) != n || !is.numeric(mu) || any(!is.finite(mu)))) {
+    stop("mu must be a finite numeric vector of the same dimension as Sigma")
   }
-  if (!is.null(semiDev) && length(semiDev) != n) {
-    stop("semiDev must be of the same dimension as Sigma")
+  if (!is.null(semiDev) && (length(semiDev) != n || !is.numeric(semiDev) ||
+                            any(!is.finite(semiDev)))) {
+    stop("semiDev must be a finite numeric vector of the same dimension as Sigma")
+  }
+  if (!is.null(semiDev) && any(semiDev < 0)) {
+    stop("semiDev must be non-negative")
   }
   ctr <- .ctrPortfolio(n, control)
 
@@ -419,14 +445,22 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (!is.null(control$LB) || !is.null(control$UB)) {
     control$w0 <- .projectBox(control$w0, control$LB, control$UB)
   }
+  ## the gross budget applies to the starting value too: slsqp handed a start
+  ## that already violates it can stop there and return it unchanged
+  if (control$constraint[1] == "gross" && sum(abs(control$w0)) > control$gross.c + 1e-08) {
+    control$w0 <- .projectBox(rep(1, n)/n, control$LB, control$UB)
+    if (sum(abs(control$w0)) > control$gross.c + 1e-08) {
+      stop("'gross.c' is incompatible with 'LB' and 'UB'")
+    }
+  }
 
   # risk aversion parameter
   if (!("gamma" %in% nam) || is.null(control$gamma)) {
     control$gamma <- 0.89
   }
-  if (!is.numeric(control$gamma) || !is.finite(control$gamma[1]) ||
-      control$gamma[1] <= 0) {
-    stop("'gamma' is not properly defined")
+  if (!is.numeric(control$gamma) || length(control$gamma) != 1L ||
+      !is.finite(control$gamma) || control$gamma <= 0) {
+    stop("'gamma' must be a single positive number")
   }
 
   # optimization list
@@ -454,7 +488,10 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   if (is.null(mu)) {
     stop("A vector of mean (mu) is required to compute the mean-variance portfolio")
   }
-  if (ctr$constraint[1] == "none") {
+  bounded <- !is.null(ctr$LB) || !is.null(ctr$UB)
+  if (ctr$constraint[1] == "gross") {
+    w <- .grossQP(ctr$gamma[1] * Sigma, mu, ctr, n)
+  } else if (!bounded) {
     ## Solution of max_w {w'mu - gamma/2 w'Sigma w} s.t. w'1 = 1, in two-fund
     ## form: the minimum-variance portfolio plus 1/gamma times a self-financing
     ## speculative portfolio. Rescaling Sigma^-1 mu to sum to one instead would
@@ -465,35 +502,11 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     a <- sum(invSigma1)
     b <- sum(invSigmamu)
     w <- invSigma1/a + (1/ctr$gamma[1]) * (invSigmamu - (b/a) * invSigma1)
-  } else if (ctr$constraint[1] == "lo" || ctr$constraint[1] == "user") {
-    Dmat <- ctr$gamma[1] * Sigma
-    Amat <- cbind(rep(1, n), diag(n))
-    bvec <- c(1, ctr$LB)
-    if (ctr$constraint[1] == "user") {
-      Amat <- cbind(Amat, -diag(n))
-      bvec <- c(bvec, -ctr$UB)
-    }
-    w <- quadprog::solve.QP(Dmat = Dmat, dvec = mu, Amat = Amat, bvec = bvec, 
-                            meq = 1)$solution
-  } else if (ctr$constraint[1] == "gross") {
-    .meanvar <- function(w) {
-      Sigmaw <- crossprod(Sigma, w)
-      opt <- -as.numeric(crossprod(mu, w)) + 0.5 * ctr$gamma[1] * 
-        as.numeric(crossprod(w, Sigmaw))
-      return(opt)
-    }
-    .gradmeanvar <- function(w)
-    {
-      g <- -mu + ctr$gamma[1] * crossprod(Sigma, w)
-    }
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
-    ## convex problem: a single starting value is enough
-    w <- .slsqpBest(starts = list(ctr$w0), fn = .meanvar,
-                    gr = .gradmeanvar, hin = ..grossContraint, ctr = ctr)
   } else {
-    # spotted in controls
+    w <- .boundedQP(ctr$gamma[1] * Sigma, mu, ctr, n)
   }
   w <- .finalizeWeights(w, ctr)
+  .checkGross(w, ctr)
   return(w)
 }
 
@@ -504,39 +517,17 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   n <- dim(Sigma)[1]
   ctr <- .ctrPortfolio(n, control)
 
-  if (ctr$constraint[1] == "none") {
+  bounded <- !is.null(ctr$LB) || !is.null(ctr$UB)
+  if (ctr$constraint[1] == "gross") {
+    w <- .grossQP(Sigma, rep(0, n), ctr, n)
+  } else if (!bounded) {
     tmp <- solve(Sigma, rep(1, n))
     w <- tmp/sum(tmp)
-  } else if (ctr$constraint[1] == "lo" || ctr$constraint[1] == "user") {
-    dvec <- rep(0, n)
-    Amat <- cbind(rep(1, n), diag(n))
-    bvec <- c(1, ctr$LB)
-    if (ctr$constraint[1] == "user") {
-      Amat <- cbind(Amat, -diag(n))
-      bvec <- c(bvec, -ctr$UB)
-    }
-    w <- quadprog::solve.QP(Dmat = Sigma, dvec = dvec, Amat = Amat, 
-                            bvec = bvec, meq = 1)$solution
-  } else if (ctr$constraint[1] == "gross") {
-    .minvol <- function(w) {
-      Sigmaw <- crossprod(Sigma, w)
-      v <- as.numeric(crossprod(w, Sigmaw))
-      return(v)
-    }    
-    .gradminvol <- function(w)
-    {
-      Sigmaw <- crossprod(Sigma, w)
-      g <- 2 * Sigmaw
-#       g <- Sigmaw / sqrt(as.numeric(crossprod(w, Sigmaw)))
-    }
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
-    ## convex problem: a single starting value is enough
-    w <- .slsqpBest(starts = list(ctr$w0), fn = .minvol,
-                    gr = .gradminvol, hin = ..grossContraint, ctr = ctr)
   } else {
-    # spotted in controls
+    w <- .boundedQP(Sigma, rep(0, n), ctr, n)
   }
   w <- .finalizeWeights(w, ctr)
+  .checkGross(w, ctr)
   return(w)
 }
 
@@ -553,6 +544,9 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ## the caller asked for is not an option either, so they are projected onto
   ## {LB <= w <= UB, w'1 = 1} and the caller is told.
   sig <- sqrt(diag(Sigma))
+  if (any(sig <= 0)) {
+    stop("the inverse-volatility portfolio requires strictly positive variances")
+  }
   w <- 1/sig
   w <- w/sum(w)
 
@@ -568,7 +562,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   return(w)
 }
 
-.ercExact <- function(Sigma, tol = 1e-14, maxit = 1000L) {
+.ercExact <- function(Sigma, tol = 1e-10, maxit = 100000L) {
   ## Exact equal-risk-contribution weights. Solve y_i [Sigma y]_i = 1/N for
   ## y > 0 by cyclical coordinate descent -- each update is the positive root
   ## of Sigma_ii y_i^2 + (sum_{j != i} Sigma_ij y_j) y_i - 1/N = 0 -- and
@@ -581,20 +575,33 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
     stop("Sigma must have positive diagonal entries to compute the erc portfolio")
   }
   y <- 1/sqrt(d)
+  ## Convergence is measured on the defining condition itself, relative to its
+  ## 1/N target, and not by the size of the last step: the step is normalised
+  ## by the largest component of y, so components orders of magnitude smaller
+  ## were declared converged while still moving. Ill-conditioned matrices can
+  ## need several thousand sweeps -- a fixed budget of a thousand returned
+  ## risk contributions differing by tens of percentage points without saying so.
+  resid <- Inf
+  converged <- FALSE
   for (it in seq_len(maxit)) {
-    yOld <- y
     for (i in 1:n) {
       b <- if (n > 1) sum(Sigma[i, -i] * y[-i]) else 0
       y[i] <- (-b + sqrt(b^2 + 4 * d[i]/n))/(2 * d[i])
     }
-    if (max(abs(y - yOld)) < tol * max(1, max(abs(y)))) {
+    resid <- max(abs(n * y * as.numeric(Sigma %*% y) - 1))
+    if (is.finite(resid) && resid < tol) {
+      converged <- TRUE
       break
     }
+  }
+  if (!converged) {
+    warning("the equal-risk-contribution weights did not converge after ", maxit,
+            " iterations; the risk contributions still depart from 1/N by up to ",
+            format(resid, digits = 3), " in relative terms")
   }
   w <- as.numeric(y/sum(y))
   return(w)
 }
-
 .ercPortfolio <- function(Sigma, control = list()) {
   ## Compute the weight of the equal-risk-contribution portfolio INPUTs
   ## Sigma : matrix (N x N) covariance matrix control : list of control
@@ -610,8 +617,9 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ## portfolio converges to one of them as soon as the correlation matrix has
   ## sizeable negative entries.
   if (ctr$constraint[1] == "none" || ctr$constraint[1] == "lo") {
-    w <- .ercExact(Sigma)
-    return(.finalizeWeights(w, ctr))
+    w <- .finalizeWeights(.ercExact(Sigma), ctr)
+    .checkGross(w, ctr)
+    return(w)
   }
 
   .pRC <- function(w) {
@@ -637,12 +645,15 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
 
   ## the unconstrained erc portfolio is the natural extra starting value here
   starts <- .startingValues(ctr, Sigma)
-  starts <- unique(c(starts, list(.projectBox(.ercExact(Sigma), ctr$LB, ctr$UB))))
+  ## only a starting value here, so a non-converged run is not worth reporting
+  starts <- unique(c(starts, list(.projectBox(suppressWarnings(.ercExact(Sigma)),
+                                              ctr$LB, ctr$UB))))
 
   w <- .slsqpBest(starts = starts, fn = .pRC, gr = .gradERC,
                   hin = ..grossContraint, ctr = ctr)
 
   w <- .finalizeWeights(w, ctr)
+  .checkGross(w, ctr)
   return(w)
 }
 
@@ -672,12 +683,17 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   ..grossContraint = NULL
   if (ctr$constraint[1] == "gross") {
     ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
+  } else if (is.null(ctr$LB) && is.null(ctr$UB)) {
+    ## nothing bounds the weights here, and the diversification ratio has no
+    ## maximum when Sigma is singular
+    .requirePD(Sigma, "the maximum-diversification ratio")
   }
 
   w <- .slsqpBest(starts = .startingValues(ctr, Sigma), fn = .divRatio,
                   gr = .gradMaxDiv, hin = ..grossContraint, ctr = ctr)
 
   w <- .finalizeWeights(w, ctr)
+  .checkGross(w, ctr)
   return(w)
 }
 
@@ -741,6 +757,7 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
                   gr = .gradRiskEff, hin = ..grossContraint, ctr = ctr)
 
   w <- .finalizeWeights(w, ctr)
+  .checkGross(w, ctr)
   return(w)
 }
 
@@ -751,41 +768,73 @@ optimalPortfolio <- function(Sigma, mu = NULL, semiDev = NULL, control = list())
   n <- dim(Sigma)[1]
   ctr <- .ctrPortfolio(n, control)
   Rho <- stats::cov2cor(Sigma)
-  if (ctr$constraint[1] == "none") {
+  bounded <- !is.null(ctr$LB) || !is.null(ctr$UB)
+  if (ctr$constraint[1] == "gross") {
+    w <- .grossQP(Rho, rep(0, n), ctr, n)
+  } else if (!bounded) {
     ## the maximum-decorrelation portfolio minimises w'Rw, not w'Sigma w:
     ## solving with Sigma here returned the minimum-variance portfolio
     tmp <- solve(Rho, rep(1, n))
     w <- tmp/sum(tmp)
-  } else if (ctr$constraint[1] == "lo" || ctr$constraint[1] == "user") {
-    dvec <- rep(0, n)
-    Amat <- cbind(rep(1, n), diag(n))
-    bvec <- c(1, ctr$LB)
-    if (ctr$constraint[1] == "user") {
-      Amat <- cbind(Amat, -diag(n))
-      bvec <- c(bvec, -ctr$UB)
-    }
-    w <- quadprog::solve.QP(Dmat = Rho, dvec = dvec, Amat = Amat, 
-                            bvec = bvec, meq = 1)$solution
-  } else if (ctr$constraint[1] == "gross") {
-    .maxdec <- function(w) {
-      Rhow <- crossprod(Rho, w)
-      v <- as.numeric(crossprod(w, Rhow)) # equivalent to: v <- sqrt(as.numeric(crossprod(w, Rhow)))
-      return(v)
-    }    
-    .gradmaxdec <- function(w)
-    {
-      Rhow <- crossprod(Rho, w)
-      g <- 2 * Rhow
-    }
-    ..grossContraint = function(w) .grossConstraint(w, ctr$gross.c)
-    ## convex problem: a single starting value is enough
-    w <- .slsqpBest(starts = list(ctr$w0), fn = .maxdec,
-                    gr = .gradmaxdec, hin = ..grossContraint, ctr = ctr)
   } else {
-    # spotted in controls
+    w <- .boundedQP(Rho, rep(0, n), ctr, n)
   }
   w <- .finalizeWeights(w, ctr)
+  .checkGross(w, ctr)
   return(w)
+}
+
+## Quadratic programs used by the convex portfolio problems.
+
+.boundedQP <- function(Q, lin, ctr, n) {
+  ## min 1/2 w'Q w - lin'w  s.t.  w'1 = 1 and whatever bounds were supplied.
+  ## Every supplied bound enters the program: applying a bound afterwards, by
+  ## projecting the solution of a differently-constrained problem onto the box,
+  ## restores feasibility but does not minimise the objective.
+  Amat <- matrix(rep(1, n), ncol = 1)
+  bvec <- 1
+  if (!is.null(ctr$LB)) {
+    Amat <- cbind(Amat, diag(n))
+    bvec <- c(bvec, ctr$LB)
+  }
+  if (!is.null(ctr$UB)) {
+    Amat <- cbind(Amat, -diag(n))
+    bvec <- c(bvec, -ctr$UB)
+  }
+  quadprog::solve.QP(Dmat = Q, dvec = lin, Amat = Amat, bvec = bvec, meq = 1)$solution
+}
+
+.grossQP <- function(Q, lin, ctr, n) {
+  ## min 1/2 w'Q w - lin'w  s.t.  w'1 = 1, ||w||_1 <= gross.c and the bounds.
+  ## Splitting w = p - n with p, n >= 0 turns the L1 budget into the linear
+  ## constraint sum(p + n) <= gross.c; the relaxation is exact because any
+  ## admissible w has a representation attaining it. The problem is therefore
+  ## an ordinary quadratic program and is solved exactly, instead of being
+  ## handed to a general-purpose nonlinear optimizer that has no attainable
+  ## stopping criterion on it.
+  Z <- cbind(diag(n), -diag(n))
+  Dmat <- crossprod(Z, Q %*% Z)
+  ## Z'QZ is singular by construction; a relative ridge makes it invertible for
+  ## solve.QP and simultaneously favours the p_i n_i = 0 representation
+  ridge <- 1e-09 * max(diag(Dmat))
+  if (!is.finite(ridge) || ridge <= 0) {
+    ridge <- 1e-09
+  }
+  Dmat <- Dmat + ridge * diag(2 * n)
+  dvec <- as.numeric(crossprod(Z, lin))
+  Amat <- cbind(c(rep(1, n), rep(-1, n)), -rep(1, 2 * n), diag(2 * n))
+  bvec <- c(1, -ctr$gross.c, rep(0, 2 * n))
+  if (!is.null(ctr$LB)) {
+    Amat <- cbind(Amat, rbind(diag(n), -diag(n)))
+    bvec <- c(bvec, ctr$LB)
+  }
+  if (!is.null(ctr$UB)) {
+    Amat <- cbind(Amat, rbind(-diag(n), diag(n)))
+    bvec <- c(bvec, -ctr$UB)
+  }
+  sol <- quadprog::solve.QP(Dmat = Dmat, dvec = dvec, Amat = Amat, bvec = bvec,
+                            meq = 1)$solution
+  return(sol[1:n] - sol[(n + 1):(2 * n)])
 }
 
 ## Constraints used by the optimizers. Both are stated in the convention

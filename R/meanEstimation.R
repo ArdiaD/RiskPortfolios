@@ -19,7 +19,8 @@
 #'
 #' Default: \code{type = 'naive'}.
 #'
-#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1]}{(0, 1]};
+#' \eqn{\lambda = 1}{lambda = 1} is the no-decay limit and gives equal weights.
 #' Default: \code{lambda = 0.94}.
 #' }
 #' 
@@ -68,9 +69,7 @@ meanEstimation <- function(rets, control = list()) {
   if (missing(rets)) {
     stop("rets is missing")
   }
-  if (!is.matrix(rets)) {
-    stop("rets must be a (T x N) matrix")
-  }
+  .checkReturns(rets)
   
   ctr <- .ctrMean(control)
   
@@ -107,7 +106,7 @@ meanEstimation <- function(rets, control = list()) {
   if (!("lambda" %in% nam) || is.null(control$lambda)) {
     control$lambda <- 0.94
   }
-  .checkLambda(control$lambda)
+  .checkLambda(control$lambda, allowOne = TRUE)
   return(control)
 }
 
@@ -138,11 +137,15 @@ meanEstimation <- function(rets, control = list()) {
   ## Q = (mu - mu_min)' Sigma^-1 (mu - mu_min), so T *must* be the number of
   ## observations: taking it to be N would make the estimator independent of
   ## the sample size and it would never converge to the sample mean.
-  mu <- colMeans(rets)
-  Sigma <- cov(rets)
-  invSigma <- solve(Sigma)
   N <- dim(rets)[2]
   T <- dim(rets)[1]
+  if (T <= N) {
+    stop("the Bayes-Stein estimator inverts the sample covariance matrix and ",
+         "so requires more observations than assets (T > N)")
+  }
+  mu <- colMeans(rets)
+  Sigma <- cov(rets)
+  invSigma <- .solveOrStop(Sigma)
   i <- rep(1, N)
   invSigmai <- crossprod(invSigma, i)
   w_min <- (invSigmai)/as.numeric(crossprod(i, invSigmai))

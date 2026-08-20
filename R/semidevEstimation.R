@@ -30,7 +30,8 @@
 #'
 #' Default: \code{type = 'naive'}.
 #'
-#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+#' \item \code{lambda} decay parameter, a single number in \eqn{(0, 1]}{(0, 1]};
+#' \eqn{\lambda = 1}{lambda = 1} is the no-decay limit and gives equal weights.
 #' Default: \code{lambda = 0.94}.
 #' }
 #' 
@@ -65,9 +66,7 @@ semidevEstimation <- function(rets, control = list()) {
   if (missing(rets)) {
     stop("rets is missing")
   }
-  if (!is.matrix(rets)) {
-    stop("rets must be a (T x N) matrix")
-  }
+  .checkReturns(rets)
   
   ctr <- .ctrSemidev(control)
   
@@ -97,7 +96,7 @@ semidevEstimation <- function(rets, control = list()) {
   if (!("lambda" %in% nam) || is.null(control$lambda)) {
     control$lambda <- 0.94
   }
-  .checkLambda(control$lambda)
+  .checkLambda(control$lambda, allowOne = TRUE)
   return(control)
 }
 
@@ -115,7 +114,10 @@ semidevEstimation <- function(rets, control = list()) {
   n <- dim(rets)[2]
   semiDev <- vector("double", n)
   mu <- colMeans(rets)
-  w <- lambda^(t:1)
+  ## on the log scale, and rebased on the newest selected observation before
+  ## exponentiating: lambda^t underflows to zero for a long sample, and the
+  ## weights of the selected observations then normalised to 0/0
+  logw <- (t:1) * log(lambda)
   for (j in 1:n) {
     retsj <- rets[, j]
     muj <- mu[j]
@@ -125,7 +127,9 @@ semidevEstimation <- function(rets, control = list()) {
       semiDev[j] <- 0
       next
     }
-    wj <- w[idx]/sum(w[idx])
+    lwj <- logw[idx]
+    wj <- exp(lwj - max(lwj))
+    wj <- wj/sum(wj)
     semiDev[j] <- sqrt(sum(wj * (retsj[idx] - muj)^2))
   }
   return(semiDev)

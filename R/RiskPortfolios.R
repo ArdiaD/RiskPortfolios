@@ -41,7 +41,7 @@
 #' 
 #' Ardia, D., Boudt, K., Gagnon-Fleury, J.-P. (2017).  
 #' RiskPortfolios: Computation of risk-based portfolios in R.  
-#' \emph{Journal of Open Source Software} \bold{10}(2).
+#' \emph{Journal of Open Source Software} \bold{2}(10), 171.
 #' \doi{10.21105/joss.00171}
 #' 
 #' Choueifaty, Y., Coignard, Y. (2008).  

@@ -35,7 +35,8 @@ mean of the returns. The data must be sorted from the oldest to the latest. See 
 
 Default: \code{type = 'naive'}.
 
-\item \code{lambda} decay parameter, a single number in \eqn{(0, 1)}.
+\item \code{lambda} decay parameter, a single number in \eqn{(0, 1]}{(0, 1]};
+\eqn{\lambda = 1}{lambda = 1} is the no-decay limit and gives equal weights.
 Default: \code{lambda = 0.94}.
 }
 }
