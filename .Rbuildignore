@@ -3,3 +3,5 @@
 ^Contributing.md$
 paper
 bin
+^cran-comments\.md$
+^CRAN-SUBMISSION$
